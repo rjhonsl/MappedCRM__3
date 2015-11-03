@@ -529,7 +529,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
             save.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    txtSpouseBirthday.setText(birthday.getText() + "");
+                    txtSpouseBirthday.setText(SpouseBirthday.getText() + "");
                     d.hide();
                 }
             });
