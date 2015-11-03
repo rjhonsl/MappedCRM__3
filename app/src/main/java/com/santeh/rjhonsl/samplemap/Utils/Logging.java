@@ -53,7 +53,7 @@ public class Logging {
         String dt =  Helper.convertLongtoDateTime_DB_Format(System.currentTimeMillis());
         db.insertUserActivityData(Integer.parseInt(userid), action, latitude, longitude, dt, actiontype);
 
-        if (Helper.variables.getGlobalVar_currentLevel(activity) != 4){
+        if (Helper.variables.getGlobalVar_currentLevel(activity) != 4 && Helper.isNetworkAvailable(context)){
             StringRequest postRequest = new StringRequest(Request.Method.POST,
                     Helper.variables.URL_INSERT_USER_ACTIVITY,
                     new Response.Listener<String>() {
@@ -65,7 +65,7 @@ public class Logging {
                             }
                             else{
                                 Log.d("USER LOGGING", "Activity logging for user "+userid+" FAILED. " + response);
-                                InsertUserActivity(activity, context, userid, action, actiontype, latitude, longitude);
+//                                InsertUserActivity(activity, context, userid, action, actiontype, latitude, longitude);
                             }
                         }
                     }, new Response.ErrorListener() {

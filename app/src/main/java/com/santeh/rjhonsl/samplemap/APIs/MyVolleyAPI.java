@@ -27,12 +27,10 @@ public class MyVolleyAPI extends Application {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(ctx);
         }
-
         return mRequestQueue;
     }
 
     public <T> void addToReqQueue(Request<T> req, String tag) {
-
         getReqQueue().add(req);
     }
 
@@ -46,4 +44,18 @@ public class MyVolleyAPI extends Application {
             mRequestQueue.cancelAll(tag);
         }
     }
+
+
+    public void cancelPendingReq(Context tag) {
+        if (mRequestQueue != null) {
+            mRequestQueue.cancelAll(tag);
+        }
+    }
+
+    public void stopRequest(){
+        if (mRequestQueue != null) {
+            mRequestQueue.stop();
+        }
+    }
+
 }

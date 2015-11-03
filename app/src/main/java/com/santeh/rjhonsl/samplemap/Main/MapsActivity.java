@@ -1399,6 +1399,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
+        fusedLocation.disconnectFromApiClient();
         fusedLocation.connectToApiClient();
         db.open();
         if(activeFilter==0){

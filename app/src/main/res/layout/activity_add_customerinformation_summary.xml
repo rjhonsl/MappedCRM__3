@@ -538,7 +538,7 @@
                               android:layout_height="wrap_content"
                               android:textSize="14sp"
                               android:textColor="@color/gray_600"
-                              android:text="Last Name" />
+                              android:text="Birthday" />
 
                     <TextView android:layout_width="fill_parent"
                               android:layout_height="wrap_content"

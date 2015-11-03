@@ -432,8 +432,6 @@ public class Activity_LoginScreen extends Activity{
                                     Helper.variables.getGlobalVar_currentisActive(activity)
                                 );
                             }
-
-
                             intent.putExtra("userid", listaccounts.get(0).getUserid());
                             intent.putExtra("userlevel", listaccounts.get(0).getUserlevel());
                             intent.putExtra("username", listaccounts.get(0).getUsername());
@@ -443,11 +441,8 @@ public class Activity_LoginScreen extends Activity{
                             intent.putExtra("fromActivity", "login");
                             intent.putExtra("lat",fusedLocation.getLastKnowLocation().latitude+"");
                             intent.putExtra("long",fusedLocation.getLastKnowLocation().longitude+"");
-
-
                             startActivity(intent);
                         }
-
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -621,7 +616,9 @@ public class Activity_LoginScreen extends Activity{
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                     return "Server returned HTTP " + connection.getResponseCode()
                             + " " + connection.getResponseMessage();
+
                 }
+
 
                 // this will be useful to display download percentage
                 // might be -1: server did not report the length
@@ -683,7 +680,11 @@ public class Activity_LoginScreen extends Activity{
             // if we get here, length is known, now set indeterminate to false
             DecimalFormat df = new DecimalFormat("#.##");
 
-            mProgressDialog.setMessage("Getting updates... "+(df.format((filesize/1024)/1014))+"mb");
+
+            double fileSizeInKB = filesize / 1000;
+            // Convert the KB to MegaBytes (1 MB = 1024 KBytes)
+            double fileSizeInMB = fileSizeInKB / 1000;
+            mProgressDialog.setMessage("Getting updates... "+(df.format((fileSizeInMB))+"MB"));
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setMax(100);
             mProgressDialog.setProgress(progress[0]);

@@ -10,10 +10,12 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -30,6 +32,7 @@ import com.santeh.rjhonsl.samplemap.R;
 import com.santeh.rjhonsl.samplemap.Utils.Helper;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +58,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     ProgressDialog PD;
 
     EditText birthday;
+    private EditText SpouseBirthday;
 
     boolean isEditPressed = false;
 
@@ -68,6 +72,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     LinearLayout llFarmId, llFullName, llBirthDetails, llAddress, llHouseStatus, llTelephone, llCellphone, llCivilStatus, llSpouseFullname, llSpouseBirthday;
     int userlvl;
     private int dd, mm, yyyy;
+
 
 
     @Override
@@ -251,6 +256,63 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
             }
         });
 
+        lblHouseStatus.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editHouseStatus();
+            }
+        });
+
+        llHouseStatus.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editHouseStatus();
+            }
+        });
+
+        lblTelephone.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editOneValue(txttelePhone);
+            }
+        });
+
+        llTelephone.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editOneValue(txttelePhone);
+            }
+        });
+
+        lblCellphone.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editOneValue(txtCellphone);
+            }
+        });
+
+        llCellphone.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editOneValue(txtCellphone);
+            }
+        });
+
+
+        lblSpouseBirthday.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editSpouseBirthday();
+            }
+        });
+
+        llSpouseBirthday.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editSpouseBirthday();
+            }
+        });
+
     }
 
     private boolean editFarmID() {
@@ -272,12 +334,41 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                 @Override
                 public void onClick(View v) {
                     txtfarmid.setText(edt.getText() + "");
+                    setViewVisibilities();
                     d.hide();
                 }
             });
         }
         return false;
     }
+
+
+    private boolean editOneValue(final TextView txtView) {
+        if (isEditPressed){
+            final Dialog d = Helper.createCustomDialogThemedYesNO_WithEditText(activity, "Enter new Farm ID:", txtfarmid.getText().toString(), "Edit", "CANCEL", "SAVE", R.color.blue);
+            final EditText edt = (EditText) d.findViewById(R.id.dialog_edttext);
+            Button cancel = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
+            Button save = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
+            Helper.setCursorOnEnd(edt);
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    d.hide();
+                }
+            });
+
+            save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    txtView.setText(edt.getText() + "");
+                    d.hide();
+                }
+            });
+        }
+        return false;
+    }
+
 
 
     private boolean editFullName() {
@@ -378,6 +469,68 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         }
         return false;
     }
+    private boolean editSpouseBirthday() {
+        if (isEditPressed){
+            final Dialog d = new Dialog(activity);//
+            d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            d.setContentView(R.layout.dialog_material_themed_changebirthdetails);//Set the xml view of the dialog
+            Button cancel = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
+            Button save = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
+            SpouseBirthday = (EditText) d.findViewById(R.id.edt_dialog_Birthday);
+            TextView lblBirthPlace = (TextView) d.findViewById(R.id.lblBirthPlace);
+            final EditText birthPlace = (EditText) d.findViewById(R.id.edt_dialog_BirthPlace);
+
+            birthPlace.setVisibility(View.GONE);
+            lblBirthPlace.setVisibility(View.GONE);
+            TextView txttitle = (TextView) d.findViewById(R.id.dialog_yesno_title);
+
+            SpouseBirthday.setText(txtSpouseBirthday.getText() + "");
+
+            if (!txtSpouseBirthday.getText().toString().equalsIgnoreCase(" --- ") || !txtSpouseBirthday.getText().toString().equalsIgnoreCase("")){
+                String[] splitter = txtbirthday.getText().toString().split("-");
+                int year = Integer.parseInt(splitter[0]);
+                int month = Integer.parseInt(splitter[1]);
+                int day = Integer.parseInt(splitter[2]);
+                datePickerDialog = DatePickerDialog.newInstance(this, year, month-1, day);
+            }else{
+                Calendar calendar = Calendar.getInstance();
+                datePickerDialog =DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            }
+
+
+            txttitle.setText("Edit");
+            txttitle.setBackground(activity.getResources().getDrawable(R.color.skyblue_500));
+            cancel.setText("CANCEL");
+            save.setText("SAVE");
+            d.show();
+
+            SpouseBirthday.setFocusable(false);
+            SpouseBirthday.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    datePickerDialog.setYearRange(1910, 2037);
+                    datePickerDialog.show(getSupportFragmentManager(), DATEPICKER_TAG);
+                }
+            });
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    d.hide();
+                }
+            });
+
+            save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    txtSpouseBirthday.setText(birthday.getText() + "");
+                    d.hide();
+                }
+            });
+        }
+        return false;
+    }
+
 
 
 
@@ -433,6 +586,25 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                     d.hide();
                 }
             });
+        }
+        return false;
+    }
+
+
+    private boolean editHouseStatus() {
+        if (isEditPressed) {
+            final String[] options = new String[]{"Owned", "Rented"};
+            Dialog d = Helper.createCustomThemedListDialog(activity, options, "House Status", R.color.blue );
+            ListView lv = (ListView) d.findViewById(R.id.dialog_list_listview);
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    txthouseStatus.setText(options[position]);
+                }
+            });
+
+            d.show();
+
         }
         return false;
     }
@@ -592,25 +764,25 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     }
 
     private void setViewVisibilities() {
-        if (custInfoObject.getSubdivision().equalsIgnoreCase(" --- ")){
+        if (custInfoObject.getSubdivision().equalsIgnoreCase(" --- ") || custInfoObject.getSubdivision().equalsIgnoreCase("") ){
             txtSubdivision.setVisibility(View.GONE);
         }else{
             txtSubdivision.setVisibility(View.VISIBLE);
         }
 
-        if (custInfoObject.getStreet().equalsIgnoreCase(" --- ") ){
+        if (custInfoObject.getStreet().equalsIgnoreCase(" --- ") || custInfoObject.getStreet().equalsIgnoreCase("") ){
             txtStreet.setVisibility(View.GONE);
         }else{
             txtStreet.setVisibility(View.VISIBLE);
         }
 
-        if (custInfoObject.getSpouse_lname().equalsIgnoreCase(" --- ")){
+        if (custInfoObject.getSpouse_lname().equalsIgnoreCase(" --- ") || custInfoObject.getSpouse_lname().equalsIgnoreCase("")){
             txtSpouseLname.setVisibility(View.GONE);
         }else{
             txtSpouseLname.setVisibility(View.VISIBLE);
         }
 
-        if (custInfoObject.getSpouse_mname().equalsIgnoreCase(" --- ")){
+        if (custInfoObject.getSpouse_mname().equalsIgnoreCase(" --- ") || custInfoObject.getSpouse_mname().equalsIgnoreCase("")){
             txtSpouseMname.setVisibility(View.GONE);
         }else{
             txtSpouseMname.setVisibility(View.VISIBLE);
@@ -656,6 +828,9 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         setMm(month + 1);
         if (birthday!=null){
             birthday.setText(year +"-"+( month + 1)+ "-" + day);
+        }
+        if (SpouseBirthday!=null){
+            SpouseBirthday.setText(year +"-"+( month + 1)+ "-" + day);
         }
 
     }
