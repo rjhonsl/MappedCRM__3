@@ -48,7 +48,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     List<CustInfoObject> custInfoObjectList;
     CustInfoObject custInfoObject;
 
-    ImageButton btn_titleLeft, btn_titleRight;
+    ImageButton btn_titleLeft, btn_edit, btn_delete;
 
     public static final String DATEPICKER_TAG = "datepicker";
     DatePickerDialog datePickerDialog;
@@ -91,8 +91,10 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         PD.setCancelable(false);
         PD.setIndeterminate(true);
 
+
         btn_titleLeft = (ImageButton) findViewById(R.id.btn_title_left);
-        btn_titleRight = (ImageButton) findViewById(R.id.btn_title_right);
+        btn_edit = (ImageButton) findViewById(R.id.btn_edit);
+        btn_delete = (ImageButton) findViewById(R.id.btn_delete);
 
 
         title = (TextView) findViewById(R.id.title);
@@ -140,10 +142,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         llSpouseBirthday = (LinearLayout) findViewById(R.id.ll_spouseBirthday);
 
 
-
-
         if (getIntent() != null) {
-
             if (getIntent().hasExtra("id")) {
                 id = getIntent().getStringExtra("id");
                 showAllCustomerLocation();
@@ -157,17 +156,24 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
             }
         });
 
-        btn_titleRight.setOnClickListener(new View.OnClickListener() {
+        btn_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        btn_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-                if (custInfoObject.getIsPosted() == 0){
+                if (custInfoObject.getIsPosted() == 0) {
                     if (!isEditPressed) {
                         Helper.createCustomThemedColorDialogOKOnly(activity, "Edit", "You can start editing by long pressing the details (smaller texts under the label) that you want to change. \n\nNOTE: Spouse information cannot be modified.", "OK", R.color.skyblue_500);
                         isEditPressed = true;
                         toggleEditPressed();
-                    }else {
+                    } else {
                         final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Save Changes of Customer information?", "Save", "NO", "YES", R.color.skyblue_400);
                         Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
                         Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
@@ -188,7 +194,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                             }
                         });
                     }
-                }else{
+                } else {
                     Helper.createCustomThemedColorDialogOKOnly(activity, "Oops", "This Data is uploaded in the internet. You have to contact admin to make changes on this post.", "OK", R.color.skyblue_500);
                 }
 
@@ -612,9 +618,9 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
 
     private void toggleEditPressed() {
         if (isEditPressed){
-            btn_titleRight.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_white_24dp));
+            btn_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_darkteal_24dp));
         }else{
-            btn_titleRight.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_white_24dp));
+            btn_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_darkteal_24dp));
         }
     }
 

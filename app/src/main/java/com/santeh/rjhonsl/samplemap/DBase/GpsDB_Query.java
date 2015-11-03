@@ -345,4 +345,9 @@ public class GpsDB_Query {
 
 		return 	db.update(GpsSQLiteHelper.TBLUSERS, newValues, where, null);
 	}
+
+
+	/********************************************
+	 * 				DELETE						*
+	 ********************************************/
 }
