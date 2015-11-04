@@ -21,6 +21,7 @@ public class CustInfoObject {
 	private String address;
 	private String farmname;
 	private String farmID;
+	private String CustfarmID;
 	private String contact_number;
 	private String cultureType;
 	private String culturelevel;
@@ -715,5 +716,13 @@ public class CustInfoObject {
 
 	public void setIsPosted(int isPosted) {
 		this.isPosted = isPosted;
+	}
+
+	public String getCustfarmID() {
+		return CustfarmID;
+	}
+
+	public void setCustfarmID(String custfarmID) {
+		CustfarmID = custfarmID;
 	}
 }

@@ -512,6 +512,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="end"
+                    android:id="@+id/ll_buttonHolder"
                     android:layout_gravity="end"
                     >
                     <Button
@@ -530,16 +531,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_material_transparent"
-                        android:text="SAVE"
-                        android:id="@+id/btn_markerdetail_OK"/>
+                        android:text="CLOSE"
+                        android:id="@+id/btn_markerdetail_CANCEL"/>
+
+
                     <Button
                         android:textColor="@color/material_deep_teal_500"
                         android:textSize="15sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_material_transparent"
-                        android:text="CANCEL"
-                        android:id="@+id/btn_markerdetail_CANCEL"/>
+                        android:text="DELETE"
+                        android:id="@+id/btn_markerdetail_Delete"/>
+
+
+                    <Button
+                        android:textColor="@color/material_deep_teal_500"
+                        android:textSize="15sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_material_transparent"
+                        android:text="SAVE"
+                        android:id="@+id/btn_markerdetail_OK"/>
+
 
                 </LinearLayout>
 

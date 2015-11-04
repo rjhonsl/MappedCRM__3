@@ -100,8 +100,20 @@ public class Activity_Add_FarmInformation extends Activity {
         txtFarmID.getBackground().setColorFilter(getResources().getColor(R.color.material_deep_teal_500), PorterDuff.Mode.SRC_IN);
         txtContactNumber.getBackground().setColorFilter(getResources().getColor(R.color.material_deep_teal_500), PorterDuff.Mode.SRC_IN);
 
-        txtLat.setText("lat: "+String.valueOf(curlatitude));
-        txtLong.setText("long: "+String.valueOf(curlongtitude));
+        if (String.valueOf(curlatitude).length() >= 13){
+            txtLat.setText("lat: "+String.valueOf(curlatitude).substring(0,12));
+        }else {
+            txtLat.setText("lat: "+String.valueOf(curlatitude));
+        }
+
+
+        if (String.valueOf(curlongtitude).length() >= 13){
+            txtLong.setText("lat: "+String.valueOf(curlongtitude).substring(0,12));
+        }else {
+            txtLong.setText("long: "+String.valueOf(curlongtitude));
+        }
+
+
 
         PD = new ProgressDialog(this);
         PD.setMessage("Updating database. Please wait....");

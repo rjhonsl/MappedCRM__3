@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +32,7 @@ import com.santeh.rjhonsl.samplemap.Obj.CustInfoObject;
 import com.santeh.rjhonsl.samplemap.Parsers.CustAndPondParser;
 import com.santeh.rjhonsl.samplemap.R;
 import com.santeh.rjhonsl.samplemap.Utils.Helper;
+import com.santeh.rjhonsl.samplemap.Utils.Logging;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -176,16 +179,35 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                     @Override
                     public void onClick(View v) {
                         d.hide();
-                        boolean isDeleted = db.deleteRow_contacts(id);
+                        boolean isDeleted = db.deleteRow_CustomerAddress(id);
                         if (isDeleted){
                             Dialog d1 = Helper.createCustomThemedDialogOKOnly(activity, "Success", "Record has been successfully deleted", "OK", R.color.skyblue_500);
                             Button ok = (Button) d1.findViewById(R.id.btn_dialog_okonly_OK);
                             ok.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    ProgressDialog pd = new ProgressDialog(activity);
+                                    final ProgressDialog pd = new ProgressDialog(activity);
                                     pd.setMessage("Please wait...");
                                     pd.setCancelable(false);
+                                    pd.show();
+
+                                    final Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            pd.dismiss();
+                                            Intent intent = new Intent(activity, MapsActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            intent.putExtra("fromActivity", "addfarminfo");
+
+                                            Logging.loguserAction(activity, activity.getBaseContext(),
+                                                    Helper.userActions.TSR.DELETE_MAIN_CUSTOMERINFO+ ":" + Helper.variables.getGlobalVar_currentUserID(activity) + "-" + id + "-" + txtfirstname.getText().toString()+" "+txtlastname .getText().toString(),
+                                                    Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
+
+                                            startActivity(intent);
+                                            finish(); // call this to finish the current activity
+                                        }
+                                    }, 500);
 
                                 }
                             });
@@ -199,7 +221,6 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         btn_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 if (custInfoObject.getIsPosted() == 0) {
                     if (!isEditPressed) {
@@ -224,6 +245,35 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                                 d.hide();
                                 isEditPressed = false;
                                 toggleEditPressed();
+
+
+                               long id1 = db.updateCustomerInfo(id, txtfirstname.getText().toString(), txtlastname.getText().toString(),
+                                        txtmiddlename.getText().toString(), txtfarmid.getText().toString(), txtHouseNumber.getText().toString(), txtStreet.getText().toString(),
+                                        txtSubdivision.getText().toString(), txtBarangay.getText().toString(), txtCity.getText().toString(), txtProvince.getText().toString(), txtbirthday.getText().toString(),
+                                        txtBirthPlace.getText().toString(), txtSpouseBirthday.getText().toString(), txttelePhone.getText().toString(), txtCellphone.getText().toString(),
+                                        txtCivilStatus.getText().toString(), txtSpouseFname.getText().toString(), txtSpouseMname.getText().toString(), txtSpouseLname.getText().toString());
+                                if (id1 != -1){
+                                        Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Success" ,"Changes has been saved successfully", "OK",R.color.blue);
+                                    Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
+                                    ok.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            Intent intent = new Intent(activity, MapsActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            intent.putExtra("fromActivity", "addfarminfo");
+
+                                            Logging.loguserAction(activity, activity.getBaseContext(),
+                                                    Helper.userActions.TSR.EDIT_MAIN_CUSTOMERINFO + ":" + Helper.variables.getGlobalVar_currentUserID(activity) + "-" + id + "-" + txtfirstname.getText().toString() + " " + txtlastname.getText().toString(),
+                                                    Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    });
+                                }else{
+                                    Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something happened. Please try again.", "OK", R.color.red);
+                                }
+
                             }
                         });
                     }
@@ -663,13 +713,13 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     @Override
     protected void onPause() {
         super.onPause();
-        db.open();
+        db.close();
     }
 
     @Override
     protected void onResume() {
-        db.close();
         super.onResume();
+        db.open();
     }
 
 

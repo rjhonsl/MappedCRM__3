@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.fourmob.datetimepicker.date.DatePickerDialog;
+import com.santeh.rjhonsl.samplemap.DBase.GpsDB_Query;
 import com.santeh.rjhonsl.samplemap.R;
 import com.santeh.rjhonsl.samplemap.Utils.Helper;
 
@@ -32,6 +33,8 @@ public class Activity_Add_CustomerInformation_Basic extends FragmentActivity imp
     Activity activity;
     Context context;
 
+    GpsDB_Query db;
+
     EditText edtBirhday, edtFarmId, edtFname, edtMname, edtLname, edtBirthPlace;
     TextView txtnote, txttitle;
 
@@ -45,6 +48,9 @@ public class Activity_Add_CustomerInformation_Basic extends FragmentActivity imp
 
         btnBack = (ImageButton) findViewById(R.id.btn_back);
         btnNext = (ImageButton) findViewById(R.id.btn_next);
+
+        db = new GpsDB_Query(this);
+        db.open();
 
 
         Helper.hideKeyboardOnLoad(activity);
@@ -84,25 +90,28 @@ public class Activity_Add_CustomerInformation_Basic extends FragmentActivity imp
             @Override
             public void onClick(View v) {
 
-                if (!edtFarmId.getText().toString().equalsIgnoreCase("") && !edtFname.getText().toString().equalsIgnoreCase("") &&
+                 if (!edtFarmId.getText().toString().equalsIgnoreCase("") && !edtFname.getText().toString().equalsIgnoreCase("") &&
                         !edtMname.getText().toString().equalsIgnoreCase("") && !edtLname.getText().toString().equalsIgnoreCase("") &&
                         !edtBirhday.getText().toString().equalsIgnoreCase("") && !edtBirthPlace.getText().toString().equalsIgnoreCase("")){
-
-                    final Intent intent = new Intent(Activity_Add_CustomerInformation_Basic.this, Activity_Add_CustomerInformation_Address.class);
-                    intent.putExtra("latitude", lat);
-                    intent.putExtra("longtitude", lng);
-                    intent.putExtra("farmid",   edtFarmId.getText()+"");
-                    intent.putExtra("fname",    edtFname.getText()+"");
-                    intent.putExtra("lname",    edtLname.getText()+"");
-                    intent.putExtra("mname",    edtMname.getText()+"");
-                    intent.putExtra("birthday", edtBirhday.getText()+"");
-                    intent.putExtra("birthplace", edtBirthPlace.getText()+"");
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-                }else {
+                     boolean isExisting = db.isFarmIDexisting(edtFarmId.getText().toString());
+                     if (isExisting) {
+                         Helper.createCustomThemedDialogOKOnly(activity, "Oops", "Farm ID already exist. \n\nYou could only have one Farm ID per Customer", "OK", R.color.darkgreen_800);
+                     }else{
+                         final Intent intent = new Intent(Activity_Add_CustomerInformation_Basic.this, Activity_Add_CustomerInformation_Address.class);
+                         intent.putExtra("latitude", lat);
+                         intent.putExtra("longtitude", lng);
+                         intent.putExtra("farmid",   edtFarmId.getText()+"");
+                         intent.putExtra("fname",    edtFname.getText()+"");
+                         intent.putExtra("lname",    edtLname.getText()+"");
+                         intent.putExtra("mname",    edtMname.getText()+"");
+                         intent.putExtra("birthday", edtBirhday.getText()+"");
+                         intent.putExtra("birthplace", edtBirthPlace.getText()+"");
+                         startActivity(intent);
+                         overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+                     }
+                } else {
                     Helper.createCustomThemedDialogOKOnly(activity, "Warning", "You must complete fields with '*' to continue.", "OK", R.color.red);
                 }
-
             }
         });
     }
@@ -114,6 +123,18 @@ public class Activity_Add_CustomerInformation_Basic extends FragmentActivity imp
         d = day;
 
         edtBirhday.setText(m+"/"+d+"/"+y);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        db.open();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        db.close();
     }
 }
 

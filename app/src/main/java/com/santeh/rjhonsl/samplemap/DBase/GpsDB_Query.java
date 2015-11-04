@@ -37,6 +37,7 @@ public class GpsDB_Query {
 
 	/********************************************
 	 * 				INSERTS						*
+	 * 	returns index/rowNum of inserted values *
 	 ********************************************/
 	public void insertUserAccountInfo(int userid, int userlvl, String firstname, String lastname, String username, String password, String deviceID, String dateAdded, int isActive){
 		ContentValues values = new ContentValues();
@@ -140,7 +141,7 @@ public class GpsDB_Query {
 									  String userID){
 
 		ContentValues values = new ContentValues();
-//		values.put(GpsSQLiteHelper.CL_FARMINFO_ID, customerid);
+//		values.put(GpsSQLiteHelper.CL_FarmInfo_ID, customerid);
 		values.put(GpsSQLiteHelper.CL_FARMINFO_LAT, latitude);
 		values.put(GpsSQLiteHelper.CL_FARMINFO_LNG, longitude);
 		values.put(GpsSQLiteHelper.CL_FARMINFO_CONTACT_NAME, contactName);
@@ -208,8 +209,8 @@ public class GpsDB_Query {
 
 				"WHERE tblCustomerInfo.addedby = ? \n" +
 
-				"GROUP BY "+GpsSQLiteHelper.CL_FARMINFO_ID+"  \n" +
-				"ORDER BY "+GpsSQLiteHelper.CL_FARMINFO_ID+"  ASC;"
+				"GROUP BY "+GpsSQLiteHelper.CL_FarmInfo_ID +"  \n" +
+				"ORDER BY "+GpsSQLiteHelper.CL_FarmInfo_ID +"  ASC;"
 				;
 		String[] params =  new String[] {userid};
 		return db.rawQuery(query, params);
@@ -237,8 +238,8 @@ public class GpsDB_Query {
 				"WHERE tblCustomerInfo.addedby = ? \n" +
 				"AND tblCustomerInfo.farmid = ? \n" +
 
-				"GROUP BY "+GpsSQLiteHelper.CL_FARMINFO_ID+"  \n" +
-				"ORDER BY "+GpsSQLiteHelper.CL_FARMINFO_ID+"  ASC;"
+				"GROUP BY "+GpsSQLiteHelper.CL_FarmInfo_ID +"  \n" +
+				"ORDER BY "+GpsSQLiteHelper.CL_FarmInfo_ID +"  ASC;"
 				;
 		String[] params =  new String[] {userid, farmid};
 		return db.rawQuery(query, params);
@@ -260,6 +261,21 @@ public class GpsDB_Query {
 
 		String[] params =  new String[] {index};
 		return db.rawQuery(query, null);
+	}
+
+	public boolean isFarmIDexisting(String farmid){
+		boolean isexisting = false;
+		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLMAINCUSTOMERINFO +" WHERE "
+				+ GpsSQLiteHelper.CL_MAINCUSTINFO_FarmId + " = ? "
+				;
+		String[] params = new String[] {farmid};
+		Cursor cur = db.rawQuery(query, params);
+		if (cur!=null){
+			if (cur.getCount() > 0){
+				isexisting = true;
+			}
+		}
+		return  isexisting;
 	}
 
 
@@ -330,6 +346,7 @@ public class GpsDB_Query {
 
 	/********************************************
 	 * 				UPDATES						*
+	 * updates return the number of rows affectd*
 	 ********************************************/
 	public int updateRowOneUser(String userid, String lvl, String firstname, String lastname, String username, String password, String deviceid, String dateAdded) {
 		String where = GpsSQLiteHelper.CL_USERS_ID + " = " + userid;
@@ -347,13 +364,65 @@ public class GpsDB_Query {
 	}
 
 
+	public int updateRowFarmInfo(String indexid, String contactname, String company, String address, String farmname, String farmid, String contactNumber, String cultSystem,
+								 String cultLevel, String WaterType ) {
+
+		String where = GpsSQLiteHelper.CL_FarmInfo_ID + " = " + indexid;
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_CONTACT_NAME, contactname);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_COMPANY, company);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_FARM_ADDRESS, address);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_FARM_NAME, farmname);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_FARM_ID, farmid);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_C_NUMBER, contactNumber);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_CULTYPE, cultSystem);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_CULTlVL, cultLevel);
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_WATTYPE, WaterType);
+
+		return 	db.update(GpsSQLiteHelper.TBLFARMiNFO, newValues, where, null);
+	}
+
+	public int updateCustomerInfo(String id, String firstname, String lastname, String middleName, String farmID, String houseNumber, String street, String subdivision, String barangay,
+								  String city, String province, String birthday, String birthPlace, String spouseBirthday, String telephone, String cellphone, String civilStatus, String spouseFirstName,
+								  String spouseMiddleName, String spouseLastName){
+		String where = GpsSQLiteHelper.CL_MAINCUSTINFO_ID + " = " + id;
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_FirstName, firstname );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_LastName, lastname );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_MiddleName, middleName );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_FarmId, farmID );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_HouseNumber, houseNumber );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_Street, street );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_Subdivision, subdivision );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_Barangay, barangay );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_City, city );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_Province, province );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_CBirthday, birthday );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_CBirthPlace, birthPlace );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_Telephone, telephone );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_Cellphone, cellphone );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_CivilStatus, civilStatus );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_S_FirstName, spouseFirstName );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_S_MiddleName, spouseMiddleName );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_S_LastName, spouseLastName );
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_S_BirthDay, spouseBirthday );
+
+		return 	db.update(GpsSQLiteHelper.TBLMAINCUSTOMERINFO, newValues, where, null);
+	}
+
+
 	/********************************************
 	 * 				DELETE						*
 	 ********************************************/
 
 	//Deletes row from Contacts
-	public boolean deleteRow_contacts(String rowId) {
+	public boolean deleteRow_CustomerAddress(String rowId) {
 		String where = GpsSQLiteHelper.CL_MAINCUSTINFO_ID + "=" + rowId;
 		return db.delete(GpsSQLiteHelper.TBLMAINCUSTOMERINFO, where, null) != 0;
+	}
+
+	public boolean deleteRow_FarmInfo(String rowId) {
+		String where = GpsSQLiteHelper.CL_FarmInfo_ID + "=" + rowId;
+		return db.delete(GpsSQLiteHelper.TBLFARMiNFO, where, null) != 0;
 	}
 }

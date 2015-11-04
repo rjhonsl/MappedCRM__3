@@ -71,7 +71,7 @@ public class Activity_ViewCustomerInfo extends Activity {
         PD.setMessage("Loading stuff....");
         PD.setCancelable(false);
 
-        url = "http://mysanteh.site50.net/santehweb/selectCustinfoLeftJoinPondinf.php";
+        url = Helper.variables.URL_SELECT_ALL_CUSTINFO_LEFTJOIN_PONDINFO;
         search();
 
         lvSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -107,7 +107,7 @@ public class Activity_ViewCustomerInfo extends Activity {
 
                         }
                         else if (index == 1){ //View and Edit details
-                            Intent intent = new Intent(Activity_ViewCustomerInfo.this, Activity_CustomerInfo_Edit.class);
+                            Intent intent = new Intent(Activity_ViewCustomerInfo.this, Activity_FarmInfo_Edit.class);
                             intent.putExtra("lat", searchedList.get(position).getLatitude());
                             intent.putExtra("userid", searchedList.get(position).getId());
                             intent.putExtra("long", searchedList.get(position).getLongtitude());

@@ -163,8 +163,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         nav_usermonitoring = (TextView) findViewById(R.id.txt_Nav_UserMonitoring);
         txtusername = (TextView) findViewById(R.id.username);
 
-//
-//
 
 
 
@@ -271,14 +269,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 farmidd = splitted[6];
 
-                if (lat > 0 && lng > 0){
+                if (lat != 0 && lng != 0){
                     Helper.moveCameraAnimate(maps, new LatLng(lat, lng), 15);
                     maps.clear();
 
                     showAllCustomerLocation();
                 }else{
-                    Helper.createCustomThemedDialogOKOnly(activity, "Oops", "Address of farm owner is currently not available. \n\nFarm ID: " + farmidd +
-                            splitted[0] + " " + splitted[1] + " " + splitted[2] + " " + splitted[3] + " " + splitted[4] + " " + splitted[5] + " " + splitted[6] + " "
+                    Helper.createCustomThemedDialogOKOnly(activity, "Oops", "Address of farm owner is currently not available. \n\nFarm ID: " + farmidd
+//                            + " "+ splitted.length + " " + splitted[0] + " " + splitted[1] + " " + splitted[2] + " " + splitted[3] + " " + splitted[4] + " " + splitted[5] + " " + splitted[6] + " "
                             , "OK", R.color.blue);
                 }
 
@@ -549,63 +547,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     });
 
-
-//
-//                    final Handler handler1 = new Handler();
-//                    handler1.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            final LatLng latlng = fusedLocation.getLastKnowLocation();
-//
-//                            if (checkIfLocationAvailable() || latlng != null) {
-//                                try {
-//                                    //getLastKnownLocation();
-//
-//
-//
-//                                    final Handler handler = new Handler();
-//                                    handler.postDelayed(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//
-//                                            String[] options = {"Farm Information", "Customer Information"};
-//                                            final Dialog d1 = Helper.createCustomThemedListDialogWithPrompt(activity, options, "Add Marker",
-//                                                    "Select the type of marker you want to add on this location.\n\nLat. " + latlng.latitude + "     Lng. " + latlng.longitude, R.color.blue);
-//                                            ListView lvoptions = (ListView) d1.findViewById(R.id.dialog_list_listview);
-//                                            lvoptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                                                @Override
-//                                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                                                    if (position == 0) {
-//
-//                                                        d1.hide();
-//                                                        final Intent intent = new Intent(MapsActivity.this, Activity_Add_FarmInformation.class);
-//                                                        intent.putExtra("latitude", latlng.latitude);
-//                                                        intent.putExtra("longtitude", latlng.longitude);
-//                                                        startActivity(intent);
-//                                                        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-//                                                    }
-//
-//                                                    if (position == 1) {
-//                                                        d1.hide();
-//                                                        final Intent intent = new Intent(MapsActivity.this, Activity_Add_CustomerInformation_Basic.class);
-//                                                        intent.putExtra("latitude", latlng.latitude);
-//                                                        intent.putExtra("longtitude", latlng.longitude);
-//                                                        startActivity(intent);
-//                                                        overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-//                                                    }
-//                                                }
-//                                            });
-//                                        }
-//                                    }, 1200);
-//
-//                                } catch (Exception e) {
-//                                    dialogLocationNotAvailableOkOnly();
-//                                }
-//                            } else {
-//                                dialogLocationNotAvailableOkOnly();
-//                            }
-//                        }
-//                    }, 200);
                 } else {
                     Helper.isLocationAvailablePrompt(context, activity);
                 }
@@ -628,8 +569,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onInfoWindowClick(final Marker marker) {
 
-
-
                 final String[] details = marker.getTitle().split("#-#");
                 if (activeSelection.equalsIgnoreCase("farm")) {
                     String  curId = "";
@@ -641,14 +580,44 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         curId = curId + c;
                     }
 
-                    LatLng location = marker.getPosition();
+                    String[] options = new String[] {"Case/Ponds","Farm Details"};
+                    final Dialog d = Helper.createCustomThemedListDialog(activity,options, "Options", R.color.blue);
+                    ListView lv = (ListView) d.findViewById(R.id.dialog_list_listview);
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            LatLng location = marker.getPosition();
+                            if (position == 0) {
 
-                    Intent intent = new Intent(MapsActivity.this, Activity_ManagePonds.class);
-                    intent.putExtra("id", Integer.parseInt(details[0]));
-                    intent.putExtra("farmname", "" + details[1]);
-                    intent.putExtra("latitude", location.latitude + "");
-                    intent.putExtra("longitude", location.longitude + "");
-                    startActivity(intent);
+                                d.hide();
+                                Intent intent = new Intent(MapsActivity.this, Activity_ManagePonds.class);
+                                intent.putExtra("id", Integer.parseInt(details[0]));
+                                intent.putExtra("farmname", "" + details[1]);
+                                intent.putExtra("latitude", location.latitude + "");
+                                intent.putExtra("longitude", location.longitude + "");
+                                startActivity(intent);
+                            } else if (position == 1) {
+                                d.hide();
+                                Intent intent = new Intent(MapsActivity.this, Activity_FarmInfo_Edit.class);
+                                intent.putExtra("lat", location.latitude+"");
+                                intent.putExtra("userid", Integer.parseInt(details[0]));
+                                intent.putExtra("long", location.longitude+"");
+                                intent.putExtra("contactName", details[7]);
+                                intent.putExtra("address", marker.getSnippet());
+                                intent.putExtra("farmname", details[1]);
+                                intent.putExtra("farmID", details[6]);
+                                intent.putExtra("contactnumber", details[8]);
+                                intent.putExtra("culturesystem", details[9]);
+                                intent.putExtra("levelofculture", details[10]);
+                                intent.putExtra("watertype", details[11]);
+
+                                intent.putExtra("fromActivity", "viewCustinfo");
+                                startActivity(intent);
+                            }
+                        }
+                    });
+
+
                 } else if (activeSelection.equalsIgnoreCase("customer")) {
 
                     String[] options = new String[] {"Customer Details","Owned Farms"};
@@ -848,7 +817,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             @Override
                             public void onResponse(final String response) {
                                 if (response.substring(1, 2).equalsIgnoreCase("0")) {
-                                    PD.dismiss(); updateDisplay();
+                                    PD.dismiss();
+                                    updateDisplay();
                                 } else {
                                     PD.dismiss();
                                     custInfoObjectList = CustAndPondParser.parseFeed(response);
@@ -916,7 +886,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 while (cur.moveToNext()) {
                     CustInfoObject custInfoObject = new CustInfoObject();
                     /** FARM INFO **/
-                    custInfoObject.setCi_id(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_ID)));
+                    custInfoObject.setCi_id(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_FarmInfo_ID)));
                     custInfoObject.setLatitude(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_LAT)));
                     custInfoObject.setLongtitude(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_LNG)));
                     custInfoObject.setContact_name(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_CONTACT_NAME)));
@@ -951,7 +921,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     custInfoObject.setLastname(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_LastName)));
                     custInfoObject.setFirstname(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_FirstName)));
                     custInfoObject.setMiddleName(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_MiddleName)));
-                    custInfoObject.setFarmID(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_FarmId)));
+                    custInfoObject.setCustfarmID(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_FarmId)));
                     custInfoObject.setStreet(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Street)));
                     custInfoObject.setHouseNumber(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_HouseNumber)));
                     custInfoObject.setSubdivision(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Subdivision)));
@@ -1310,7 +1280,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLng custLatlng = new LatLng(Double.parseDouble(ci.getLatitude() + ""), Double.parseDouble(ci.getLongtitude() + ""));
                     Helper.map_addMarker(maps, custLatlng,
                             R.drawable.ic_place_red_24dp, ci.getFarmname(), ci.getAddress(), ci.getCi_id() + "", ci.getTotalStockOfFarm() + "",
-                            ci.getAllSpecie() + "#-#" + ci.getCust_latitude() + "#-#" + ci.getCust_longtitude() + "#-#" +ci.getFarmID());
+                            ci.getAllSpecie() + "#-#" + ci.getCust_latitude() + "#-#" + ci.getCust_longtitude() + "#-#" + ci.getFarmID() + "#-#"
+                                    + ci.getContact_name() + "#-#" + ci.getContact_number() + "#-#" + ci.getCultureType() + "#-#" + ci.getCulturelevel() + "#-#" + ci.getWaterType());
                 }
             } else {prompt_noFarm();}
         } else {prompt_noFarm(); }
@@ -1413,7 +1384,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void exitApp() {
-        final Dialog d = Helper.createCustomDialogYesNO(activity, R.layout.dialog_material_yesno, "Do you wish to wish to exit the app? You will have to login next time.", "EXIT", "YES", "NO");
+        final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Do you wish to wish to exit the app? You will have to login next time.", "EXIT", "YES", "NO", R.color.blue);
         d.show();
         Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
         Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
@@ -1440,7 +1411,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private void logout() {
-        final Dialog d = Helper.createCustomDialogYesNO(activity, R.layout.dialog_material_yesno, "Do you wish to wish to return to Login Screen?", "Log Out", "YES", "NO");
+        final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Do you wish to wish to return to Login Screen?", "Log Out", "YES", "NO", R.color.blue);
         d.show();
         Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
         Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
@@ -1450,7 +1421,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 d.hide();
                 closeDrawer();
-                final Dialog d2 =  Helper.initProgressDialog(activity);
+                final Dialog d2 = Helper.initProgressDialog(activity);
                 d2.show();
 
                 TextView message = (TextView) d2.findViewById(R.id.progress_message);

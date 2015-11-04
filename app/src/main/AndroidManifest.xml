@@ -69,7 +69,7 @@
                   android:label="Grow Outs">
         </activity>
 
-        <activity android:name=".Main.Activity_CustomerInfo_Edit"
+        <activity android:name=".Main.Activity_FarmInfo_Edit"
                   android:label="Edit Customer Info">
         </activity>
 

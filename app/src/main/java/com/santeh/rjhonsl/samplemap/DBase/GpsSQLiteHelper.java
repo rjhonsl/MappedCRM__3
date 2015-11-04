@@ -80,7 +80,7 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 	//reference for tblarea
 	public static final String TBLFARMiNFO 				= "tblCustomerInfo";
 
-	public static final String CL_FARMINFO_ID			= "ci_customerId";
+	public static final String CL_FarmInfo_ID = "ci_customerId";
 	public static final String CL_FARMINFO_LAT			= "latitude";
 	public static final String CL_FARMINFO_LNG			= "longtitude";
 	public static final String CL_FARMINFO_CONTACT_NAME	= "contact_name";
@@ -95,7 +95,7 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 	public static final String CL_FARMINFO_dateAdded	= "dateAdded";
 	public static final String CL_FARMINFO_addedby		= "addedby";
 	public static final String CL_FARMINFO_IsPosted		= "isposted";
-	public static final String[] ALL_KEY_fARM		= new String[]{CL_FARMINFO_ID, CL_FARMINFO_LAT,CL_FARMINFO_LNG,CL_FARMINFO_CONTACT_NAME, CL_FARMINFO_COMPANY, CL_FARMINFO_FARM_ADDRESS
+	public static final String[] ALL_KEY_fARM		= new String[]{CL_FarmInfo_ID, CL_FARMINFO_LAT,CL_FARMINFO_LNG,CL_FARMINFO_CONTACT_NAME, CL_FARMINFO_COMPANY, CL_FARMINFO_FARM_ADDRESS
 	,CL_FARMINFO_FARM_NAME, CL_FARMINFO_FARM_ID, CL_FARMINFO_C_NUMBER, CL_FARMINFO_CULTYPE, CL_FARMINFO_CULTlVL, CL_FARMINFO_WATTYPE,CL_FARMINFO_dateAdded,  CL_FARMINFO_addedby, CL_FARMINFO_IsPosted};
 
 
@@ -228,7 +228,7 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 	private static final String TBL_CREATE_FARMINFO =
 			"CREATE TABLE " + TBLFARMiNFO + " " +
 					"(" +
-					CL_FARMINFO_ID				+ " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+					CL_FarmInfo_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					CL_FARMINFO_LAT 			+ " TEXT, " +
 					CL_FARMINFO_LNG 			+ " TEXT, " +
 					CL_FARMINFO_CONTACT_NAME	+ " TEXT, " +

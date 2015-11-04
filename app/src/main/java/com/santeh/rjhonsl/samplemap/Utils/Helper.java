@@ -74,6 +74,8 @@ public class Helper {
             public static String DELETE_POND="Delete Pond Information";
             public static String Edit_POND  ="Modify Pond Information";
             public static String ADD_MAIN_CUSTOMERINFO ="Add Customer Address Information";
+            public static String DELETE_MAIN_CUSTOMERINFO ="DELETE Customer Address Information";
+            public static String EDIT_MAIN_CUSTOMERINFO ="EDIT Customer Address Information";
             public static String ADD_WEEKLYREPORT ="Add Weekly Report";
 
             public static String USER_LOGIN = "Login";
@@ -778,6 +780,8 @@ public class Helper {
         txttitle.setBackground(activity.getResources().getDrawable(resIdColor));
         btn1.setText(strButton1);
         btn2.setText(strButton2);
+        d.show();
+
         return d;
     }
 
