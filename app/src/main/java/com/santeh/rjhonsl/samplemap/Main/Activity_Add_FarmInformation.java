@@ -172,7 +172,7 @@ public class Activity_Add_FarmInformation extends Activity {
                     Helper.variables.getGlobalVar_currentUserID(activity) + "");
             if (id != -1){
                 PD.dismiss();
-                Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_Add_FarmInformation.this, "SUCCESS",
+                Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_Add_FarmInformation.this, "SUCCESS",
                         "You have successfully added " + txtContactName.getText().toString() + " to database", "OK", R.color.blue);
                 TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
                 d.setCancelable(false);
@@ -194,7 +194,7 @@ public class Activity_Add_FarmInformation extends Activity {
                 });
             }else{
                 PD.dismiss();
-                Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Saving Failed! Please try again.", "OK", R.color.red);
+                Helper.createCustomThemedDialogOKOnly(activity, "Error", "Saving Failed! Please try again.", "OK", R.color.red);
             }
 
 //
@@ -213,7 +213,7 @@ public class Activity_Add_FarmInformation extends Activity {
 //
 //
 //                                PD.dismiss();
-//                                Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_Add_FarmInformation.this, "SUCCESS",
+//                                Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_Add_FarmInformation.this, "SUCCESS",
 //                                        "You have successfully added " + txtContactName.getText().toString() + " to database", "OK", R.color.blue);
 //                                TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
 //                                d.setCancelable(false);
@@ -233,7 +233,7 @@ public class Activity_Add_FarmInformation extends Activity {
 //
 //
 //                            }else {
-//                                Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Something happened. Please try again." , "OK", R.color.red);
+//                                Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something happened. Please try again." , "OK", R.color.red);
 //                                PD.dismiss();
 //                            }
 //

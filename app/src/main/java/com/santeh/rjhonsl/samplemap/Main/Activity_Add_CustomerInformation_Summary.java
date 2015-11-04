@@ -222,7 +222,7 @@ public class Activity_Add_CustomerInformation_Summary extends FragmentActivity{
 
         Log.d("LOCAL DB", "Insert MainCustomer Info" + result);
         if (result != -1){
-            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Save", "Saving successful. ", "OK", R.color.amber_600);
+            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Save", "Saving successful. ", "OK", R.color.amber_600);
             PD.dismiss();
 
             Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
@@ -243,7 +243,7 @@ public class Activity_Add_CustomerInformation_Summary extends FragmentActivity{
 
         }else {
             PD.dismiss();
-            Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Saving of Customer Information Failed. Please Try again.", "OK", R.color.red);
+            Helper.createCustomThemedDialogOKOnly(activity, "Error", "Saving of Customer Information Failed. Please Try again.", "OK", R.color.red);
         }
 
 //
@@ -258,7 +258,7 @@ public class Activity_Add_CustomerInformation_Summary extends FragmentActivity{
 //
 //                        if (responseCode.equalsIgnoreCase("1")){
 //
-//                            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Save", "Saving successful. ", "OK", R.color.amber_600);
+//                            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Save", "Saving successful. ", "OK", R.color.amber_600);
 //
 //                            Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
 //                            ok.setOnClickListener(new View.OnClickListener() {

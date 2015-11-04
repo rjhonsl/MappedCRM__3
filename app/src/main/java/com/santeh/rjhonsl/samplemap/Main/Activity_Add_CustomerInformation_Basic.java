@@ -100,7 +100,7 @@ public class Activity_Add_CustomerInformation_Basic extends FragmentActivity imp
                     startActivity(intent);
                     overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
                 }else {
-                    Helper.createCustomThemedColorDialogOKOnly(activity, "Warning","You must complete fields with '*' to continue.", "OK", R.color.red);
+                    Helper.createCustomThemedDialogOKOnly(activity, "Warning", "You must complete fields with '*' to continue.", "OK", R.color.red);
                 }
 
             }

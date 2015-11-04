@@ -160,6 +160,39 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
             @Override
             public void onClick(View v) {
 
+                final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Are you sure you want to delete this record?", "Delete", "NO", "YES", R.color.red);
+                Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
+                Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
+                d.show();
+
+                no.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.hide();
+                    }
+                });
+
+                yes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.hide();
+                        boolean isDeleted = db.deleteRow_contacts(id);
+                        if (isDeleted){
+                            Dialog d1 = Helper.createCustomThemedDialogOKOnly(activity, "Success", "Record has been successfully deleted", "OK", R.color.skyblue_500);
+                            Button ok = (Button) d1.findViewById(R.id.btn_dialog_okonly_OK);
+                            ok.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    ProgressDialog pd = new ProgressDialog(activity);
+                                    pd.setMessage("Please wait...");
+                                    pd.setCancelable(false);
+
+                                }
+                            });
+                        }
+                    }
+                });
+
             }
         });
 
@@ -170,7 +203,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
 
                 if (custInfoObject.getIsPosted() == 0) {
                     if (!isEditPressed) {
-                        Helper.createCustomThemedColorDialogOKOnly(activity, "Edit", "You can start editing by long pressing the details (smaller texts under the label) that you want to change. \n\nNOTE: Spouse information cannot be modified.", "OK", R.color.skyblue_500);
+                        Helper.createCustomThemedDialogOKOnly(activity, "Edit", "You can start editing by long pressing the details (smaller texts under the label) that you want to change. \n\nNOTE: Spouse information cannot be modified.", "OK", R.color.skyblue_500);
                         isEditPressed = true;
                         toggleEditPressed();
                     } else {
@@ -195,7 +228,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                         });
                     }
                 } else {
-                    Helper.createCustomThemedColorDialogOKOnly(activity, "Oops", "This Data is uploaded in the internet. You have to contact admin to make changes on this post.", "OK", R.color.skyblue_500);
+                    Helper.createCustomThemedDialogOKOnly(activity, "Oops", "This Data is uploaded in the internet. You have to contact admin to make changes on this post.", "OK", R.color.skyblue_500);
                 }
 
             }
@@ -619,8 +652,10 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     private void toggleEditPressed() {
         if (isEditPressed){
             btn_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_darkteal_24dp));
+            btn_delete.setEnabled(false);
         }else{
             btn_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_edit_darkteal_24dp));
+            btn_delete.setEnabled(true);
         }
     }
 
@@ -660,7 +695,7 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                                 showCustomerDetails();
                             } else {
                                 Log.d("DEBUG", "if not local" + id + " null obj" + response);
-                                Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "No details details available. Please report this to admin.", "OK", R.color.red);
+                                Helper.createCustomThemedDialogOKOnly(activity, "Error", "No details details available. Please report this to admin.", "OK", R.color.red);
                             }
                         }
                     },
@@ -731,11 +766,11 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                     PD.dismiss();
                 }else{
                     PD.dismiss();
-                    Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Something happened. Please try again later", "OK", R.color.red);
+                    Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something happened. Please try again later", "OK", R.color.red);
                 }
             }else{
                 PD.dismiss();
-                Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Something happened. Please try again later", "OK", R.color.red);
+                Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something happened. Please try again later", "OK", R.color.red);
             }
         }
 

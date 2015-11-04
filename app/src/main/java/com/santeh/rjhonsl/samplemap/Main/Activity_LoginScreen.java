@@ -448,7 +448,7 @@ public class Activity_LoginScreen extends Activity{
             @Override
             public void onErrorResponse(VolleyError error) {
                 PD.dismiss();
-                Helper.createCustomThemedColorDialogOKOnly(activity, "Error", error.toString(), "OK", R.color.red);
+                Helper.createCustomThemedDialogOKOnly(activity, "Error", error.toString(), "OK", R.color.red);
             }
         }) {
             @Override
@@ -528,7 +528,7 @@ public class Activity_LoginScreen extends Activity{
                         public void onResponse(final String response) {
                             PD.dismiss();
 
-//                            Helper.createCustomThemedColorDialogOKOnly(activity, "RESONSE", response, "OK", R.color.red);
+//                            Helper.createCustomThemedDialogOKOnly(activity, "RESONSE", response, "OK", R.color.red);
                             if (!response.substring(1, 2).equalsIgnoreCase("0")) {
                                 String[] splitted = response.split("!-!");
                                 String versionNumber = splitted[0];
@@ -561,7 +561,7 @@ public class Activity_LoginScreen extends Activity{
                                     Helper.toastShort(activity, "Your application is up to date!");
                                 }
                             } else {
-                                Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Update Failed. Please try again later. \n"
+                                Helper.createCustomThemedDialogOKOnly(activity, "Error", "Update Failed. Please try again later. \n"
                                         , "OK", R.color.red);
                             }
                         }
@@ -569,7 +569,7 @@ public class Activity_LoginScreen extends Activity{
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     PD.dismiss();
-                    Helper.createCustomThemedColorDialogOKOnly(activity, "Error", error.toString(), "OK", R.color.red);
+                    Helper.createCustomThemedDialogOKOnly(activity, "Error", error.toString(), "OK", R.color.red);
                 }
             }) {
                 @Override

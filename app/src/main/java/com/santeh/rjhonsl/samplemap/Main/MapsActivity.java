@@ -277,8 +277,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     showAllCustomerLocation();
                 }else{
-                    Helper.createCustomThemedColorDialogOKOnly(activity, "Oops", "Address of farm owner is currently not available. \n\nFarm ID: "+farmidd+
-                            splitted[0] +" " + splitted[1] +" " +splitted[2] +" " +splitted[3] +" " +splitted[4] +" " +splitted[5] +" " +splitted[6] +" "
+                    Helper.createCustomThemedDialogOKOnly(activity, "Oops", "Address of farm owner is currently not available. \n\nFarm ID: " + farmidd +
+                            splitted[0] + " " + splitted[1] + " " + splitted[2] + " " + splitted[3] + " " + splitted[4] + " " + splitted[5] + " " + splitted[6] + " "
                             , "OK", R.color.blue);
                 }
 
@@ -478,7 +478,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             handler1.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Helper.createCustomThemedColorDialogOKOnly(activity, "Add Marker", "Long press any location within 1000 meters of your current location to Add a Marker.", "OK", R.color.blue);
+                                    Helper.createCustomThemedDialogOKOnly(activity, "Add Marker", "Long press any location within 1000 meters of your current location to Add a Marker.", "OK", R.color.blue);
                                 }
                             }, 1200);
 
@@ -504,7 +504,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                        Helper.toastLong(activity, results[0]+"");
 
                             if (results[0] > 1000) {
-                                final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Out of range", "Selection is out of 1km range from your location", "OK", R.color.red);
+                                final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Out of range", "Selection is out of 1km range from your location", "OK", R.color.red);
                                 d.show();
 
                                 Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
@@ -1182,7 +1182,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void prompt_noCustomerLocation() {
-        Helper.createCustomThemedColorDialogOKOnly(activity, "Warning", "You have not added any customer address", "OK", R.color.red);
+        Helper.createCustomThemedDialogOKOnly(activity, "Warning", "You have not added any customer address", "OK", R.color.red);
     }
 
 
@@ -1202,7 +1202,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 custInfoObjectList = CustAndPondParser.parseFeed(response);
 
                                 showAllCustomerFarmByFarmID();
-                            } else {Helper.createCustomThemedColorDialogOKOnly(activity, "Warning", "No farm related to selected customer. Please check Farm ID", "OK", R.color.red);}
+                            } else {Helper.createCustomThemedDialogOKOnly(activity, "Warning", "No farm related to selected customer. Please check Farm ID", "OK", R.color.red);}
                         }
                     },
                     new Response.ErrorListener() {
@@ -1267,8 +1267,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         d.hide();
                     }
                 });
-            }else{Helper.createCustomThemedColorDialogOKOnly(activity, "Warning", "No farm related to selected customer. Please check Farm ID" , "OK", R.color.red);}
-        }else{ Helper.createCustomThemedColorDialogOKOnly(activity, "Warning", "No farm related to selected customer. Please check Farm ID", "OK", R.color.red);}
+            }else{Helper.createCustomThemedDialogOKOnly(activity, "Warning", "No farm related to selected customer. Please check Farm ID", "OK", R.color.red);}
+        }else{ Helper.createCustomThemedDialogOKOnly(activity, "Warning", "No farm related to selected customer. Please check Farm ID", "OK", R.color.red);}
     }
 
 
@@ -1317,7 +1317,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void prompt_noFarm() {
-        final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "MAP", "You have not added a farm yet. \n You can start by pressing the  plus '+' on the upper right side of the screen.", "OK", R.color.skyblue_400);
+        final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "MAP", "You have not added a farm yet. \n You can start by pressing the  plus '+' on the upper right side of the screen.", "OK", R.color.skyblue_400);
         Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
         d.show();
         ok.setOnClickListener(new View.OnClickListener() {

@@ -214,7 +214,7 @@ public class Activity_ViewCustomerInfo extends Activity {
                                 lvSearch.setAdapter(custinfoAdapter);
                             }else {
                                 searchedList = beforesearchedList;
-                                final Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_ViewCustomerInfo.this,
+                                final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_ViewCustomerInfo.this,
                                         "OOPS!", response, "OK", R.color.blue);
 
                                 TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
@@ -228,7 +228,7 @@ public class Activity_ViewCustomerInfo extends Activity {
                             }
                         }else{
                             searchedList = beforesearchedList;
-                            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_ViewCustomerInfo.this,
+                            final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_ViewCustomerInfo.this,
                                     "OOPS!", response, "OK", R.color.blue);
 
                             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);

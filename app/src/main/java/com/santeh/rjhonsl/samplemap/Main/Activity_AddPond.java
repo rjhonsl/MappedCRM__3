@@ -132,7 +132,7 @@ public class Activity_AddPond extends FragmentActivity  implements DatePickerDia
                         || edtCultureSystem.getText().toString().equalsIgnoreCase("")
                         || edtRemarks.getText().toString().equalsIgnoreCase("")
                         ) {
-                    final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Oops","You have to complete all the following fields to continue.", "OK", R.color.red);
+                    final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Oops", "You have to complete all the following fields to continue.", "OK", R.color.red);
                     d.show();
                     Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
                     ok.setOnClickListener(new View.OnClickListener() {
@@ -208,8 +208,8 @@ public class Activity_AddPond extends FragmentActivity  implements DatePickerDia
                 edtRemarks.getText().toString(), customerID + "");
 
         if (result != -1){
-            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_AddPond.this, "Success",
-                                        "Saving successful", "OK", R.color.skyblue_500);
+            final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_AddPond.this, "Success",
+                    "Saving successful", "OK", R.color.skyblue_500);
             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
             d.show();
             ok.setOnClickListener(new View.OnClickListener() {
@@ -225,7 +225,7 @@ public class Activity_AddPond extends FragmentActivity  implements DatePickerDia
                 }
             });
         }else{
-            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_AddPond.this, "Error",
+            final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_AddPond.this, "Error",
                     "Adding failed. Please Try Again. ", "OK", R.color.red);
             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
             d.show();
@@ -247,7 +247,7 @@ public class Activity_AddPond extends FragmentActivity  implements DatePickerDia
 //                            String responseCode = Helper.extractResponseCode(response);
 //                            String title, prompt;
 //                            PD.dismiss();
-////                            Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "inserted id", response, "ok", R.color.red);
+////                            Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "inserted id", response, "ok", R.color.red);
 //
 //                            if (responseCode.equalsIgnoreCase("0")){
 //                                oopsprompt(response);
@@ -258,7 +258,7 @@ public class Activity_AddPond extends FragmentActivity  implements DatePickerDia
 //                                prompt = "You have successfully updated database.";
 //
 //
-//                                final Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_AddPond.this, title,
+//                                final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_AddPond.this, title,
 //                                        prompt, "OK", R.color.skyblue_500);
 //
 //                                TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);

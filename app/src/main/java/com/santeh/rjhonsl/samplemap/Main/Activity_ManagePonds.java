@@ -123,7 +123,7 @@ public class Activity_ManagePonds extends AppCompatActivity {
 //                        Helper.toastLong(activity, results[0]+"");
 
                         if (results[0] > 1000) {
-                            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Out of range", "You must be near the farm to Add a new pond.", "OK", R.color.red);
+                            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Out of range", "You must be near the farm to Add a new pond.", "OK", R.color.red);
                             d.show();
 
                             Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);

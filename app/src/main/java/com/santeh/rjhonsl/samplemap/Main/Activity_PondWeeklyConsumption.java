@@ -230,7 +230,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
 
                 if (position==0) {
-                    Helper.createCustomThemedColorDialogOKOnly(activity, "Warning", "You cannot Edit or Delete Initial Stocking Data", "OK",R.color.red);
+                    Helper.createCustomThemedDialogOKOnly(activity, "Warning", "You cannot Edit or Delete Initial Stocking Data", "OK", R.color.red);
                 }else {
                     String[] options = {"Edit ABW and Remarks", "Delete"};
                     final Dialog d = Helper.createCustomThemedListDialog(activity, options, "Options ", R.color.deepteal_400);
@@ -410,7 +410,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 PD.dismiss();
-                Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
+                Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
                 d.show();
             }
         }) {
@@ -447,7 +447,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
         final long result = db.insertWeeklyUpdates(abw2, remarks2, id+"", Helper.getDateDBformat());
 
         if (result != -1){
-            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_PondWeeklyConsumption.this,
+            final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_PondWeeklyConsumption.this,
                     "Success", "Saving successful", "OK", R.color.skyblue_500);
             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
             d.show();
@@ -465,7 +465,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
                 }
             });
         }else{
-            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(Activity_PondWeeklyConsumption.this,
+            final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_PondWeeklyConsumption.this,
                     "Error", "Reporting failed. Please Try Again. ", "OK", R.color.red);
             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
             d.show();
@@ -484,7 +484,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
 //                        pondweeklyList = new ArrayList<>();
 //                        PD.dismiss();
 //
-////                        Helper.createCustomThemedColorDialogOKOnly(activity, "Responze", response, "OK", R.color.red);
+////                        Helper.createCustomThemedDialogOKOnly(activity, "Responze", response, "OK", R.color.red);
 //                        if (!response.substring(1,2).equalsIgnoreCase("0")) {
 //                            Helper.toastShort(activity, "Report Added Successfully!");
 //                            getpondData(id, Helper.variables.URL_SELECT_POND_WEEKLY_UPDATES_BY_ID);
@@ -495,7 +495,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
 //            @Override
 //            public void onErrorResponse(VolleyError error) {
 //                PD.dismiss();
-//                Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
+//                Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
 //                d.show();
 //            }
 //        }) {
@@ -538,7 +538,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 PD.dismiss();
-                Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
+                Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
                 d.show();
             }
         }) {

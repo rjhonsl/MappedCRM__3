@@ -137,7 +137,7 @@ public class Activity_Add_CustomerInformation_SpouseInfo extends FragmentActivit
                             && !edtmname.getText().toString().equalsIgnoreCase("")) {
                         gotoSummary();
                     }else{
-                        Helper.createCustomThemedColorDialogOKOnly(activity, "Warning","You must complete fields with '*' to continue.", "OK", R.color.red);
+                        Helper.createCustomThemedDialogOKOnly(activity, "Warning", "You must complete fields with '*' to continue.", "OK", R.color.red);
                     }
                 } else {
                     if (!edtCivilStatus.getText().toString().equalsIgnoreCase("")) {

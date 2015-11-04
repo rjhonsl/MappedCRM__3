@@ -171,7 +171,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
 //                        Helper.toastLong(activity, results[0]+"");
 
                         if (results[0] > 1000) {
-                            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Out of range", "You must be near the farm to EDIT a new farm.", "OK", R.color.red);
+                            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Out of range", "You must be near the farm to EDIT a new farm.", "OK", R.color.red);
                             d.show();
 
                             Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
@@ -192,7 +192,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
                                     || edtCultureSystem.getText().toString().equalsIgnoreCase("")
                                     || edtRemarks.getText().toString().equalsIgnoreCase("")
                                     ) {
-                                final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, "Message","You have to complete all the following fields to continue.", "OK", R.color.red);
+                                final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Message", "You have to complete all the following fields to continue.", "OK", R.color.red);
                                 d.show();
                                 Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
                                 ok.setOnClickListener(new View.OnClickListener() {
@@ -279,7 +279,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
                             prompt = "You have successfully updated database.";
                             PD.dismiss();
 
-                            final Dialog d = Helper.createCustomThemedColorDialogOKOnly(activity, title,
+                            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, title,
                                     prompt, "OK", R.color.skyblue_500);
                             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
                             d.show();

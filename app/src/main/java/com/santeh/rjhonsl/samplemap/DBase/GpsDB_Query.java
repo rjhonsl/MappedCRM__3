@@ -350,4 +350,10 @@ public class GpsDB_Query {
 	/********************************************
 	 * 				DELETE						*
 	 ********************************************/
+
+	//Deletes row from Contacts
+	public boolean deleteRow_contacts(String rowId) {
+		String where = GpsSQLiteHelper.CL_MAINCUSTINFO_ID + "=" + rowId;
+		return db.delete(GpsSQLiteHelper.TBLMAINCUSTOMERINFO, where, null) != 0;
+	}
 }
