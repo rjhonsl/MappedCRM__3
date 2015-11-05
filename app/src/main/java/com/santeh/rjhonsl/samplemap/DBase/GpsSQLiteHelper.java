@@ -164,6 +164,7 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 	///////////// STRINGS FOR CREATING AND UPDATING TABLE ////////////
 	//////////////////////////////////////////////////////////////////
 	//Query to create tables
+
 	private static final String TBL_CREATE_MAINCUSTOMERINFO =
 			"CREATE TABLE " + TBLMAINCUSTOMERINFO + " " +
 					"(" +

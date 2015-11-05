@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.santeh.rjhonsl.samplemap.Obj.CustInfoObject;
@@ -21,7 +20,6 @@ public class AdapterPonds extends ArrayAdapter<CustInfoObject> {
 	Context context;
 	LayoutInflater inflater;
 	List<CustInfoObject> ItemList;
-	ListView listViewItem;
 	int positions = 0;
 	String tag = "CreateNew ArrayAdapter";
 	private SparseBooleanArray mSelectedItemsIds;
@@ -85,10 +83,6 @@ public class AdapterPonds extends ArrayAdapter<CustInfoObject> {
 		notifyDataSetChanged();
 	}
 
-	public List<CustInfoObject> getAnswerList() {
-		return ItemList;
-	}
-
 	public void toggleSelection(int position) {
 		selectView(position, !mSelectedItemsIds.get(position));
 	}
@@ -105,13 +99,4 @@ public class AdapterPonds extends ArrayAdapter<CustInfoObject> {
 			mSelectedItemsIds.delete(position);
 		notifyDataSetChanged();
 	}
-
-	public int getSelectedCount() {
-		return mSelectedItemsIds.size();
-	}
-
-	public SparseBooleanArray getSelectedIds() {
-		return mSelectedItemsIds;
-	}
-
 }

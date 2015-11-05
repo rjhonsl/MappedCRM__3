@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.santeh.rjhonsl.samplemap.Obj.CustInfoObject;
@@ -21,12 +20,9 @@ public class Adapter_UserMonitoring_SideNav_Activities extends ArrayAdapter<Cust
 	Context context;
 	LayoutInflater inflater;
 	List<CustInfoObject> objArrayList;
-	ListView listViewItem;
 	int positions = 0;
 	String tag = "CreateNew ArrayAdapter";
 	private SparseBooleanArray mSelectedItemsIds;
-
-//	android:id="@+id/itemlv_feedconsSummary_farmname"
 
 	public Adapter_UserMonitoring_SideNav_Activities(Context context, int resourceId, List<CustInfoObject> items) {
 		super(context, resourceId, items);
@@ -85,17 +81,8 @@ public class Adapter_UserMonitoring_SideNav_Activities extends ArrayAdapter<Cust
 		notifyDataSetChanged();
 	}
 
-	public List<CustInfoObject> getAnswerList() {
-		return objArrayList;
-	}
-
 	public void toggleSelection(int position) {
 		selectView(position, !mSelectedItemsIds.get(position));
-	}
-
-	public void removeSelection() {
-		mSelectedItemsIds = new SparseBooleanArray();
-		notifyDataSetChanged();
 	}
 
 	public void selectView(int position, boolean value) {
@@ -105,13 +92,4 @@ public class Adapter_UserMonitoring_SideNav_Activities extends ArrayAdapter<Cust
 			mSelectedItemsIds.delete(position);
 		notifyDataSetChanged();
 	}
-
-	public int getSelectedCount() {
-		return mSelectedItemsIds.size();
-	}
-
-	public SparseBooleanArray getSelectedIds() {
-		return mSelectedItemsIds;
-	}
-
 }

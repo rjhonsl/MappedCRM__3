@@ -34,8 +34,6 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
     private String specie, datestocked, culturesystem, remarks, survivalrate, latitude, longitude;
 
     private EditText edtPondNumber, edtSpecie, edtABW, edtSurvivalRate, edtDateStocked, edtQuantity, edtArea, edtCultureSystem, edtRemarks;
-    private Button btnSave;
-    private ProgressDialog PD;
 
     Activity activity;
     Context context;
@@ -54,7 +52,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editpond);
-        PD = new ProgressDialog(this);
+        ProgressDialog PD = new ProgressDialog(this);
         PD.setCancelable(false);
         activity = this;
         context = Activity_EditPonds.this;
@@ -92,7 +90,8 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
         edtArea = (EditText) findViewById(R.id.edtArea);
         edtCultureSystem = (EditText) findViewById(R.id.edtCultureSystem);
         edtRemarks = (EditText) findViewById(R.id.edtRemarks);
-        btnSave = (Button) findViewById(R.id.btnSave);
+
+        Button btnSave = (Button) findViewById(R.id.btnSave);
         btn_back = (ImageButton) findViewById(R.id.btn_title_left);
 
         btn_back.setOnClickListener(new View.OnClickListener() {
@@ -174,7 +173,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
                 fusedLocation.disconnectFromApiClient();
                 if (isposted == 1) {
                     Helper.createCustomThemedDialogOKOnly(activity, "Oops", "This record is already finalized/posted. Please contact admin for concerns", "OK", R.color.red);
-                }else{
+                } else {
                     fusedLocation.connectToApiClient();
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -199,7 +198,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
                                         d.hide();
                                     }
                                 });
-                            }else{
+                            } else {
 
                                 if (edtPondNumber.getText().toString().equalsIgnoreCase("")
                                         || edtSpecie.getText().toString().equalsIgnoreCase("")
@@ -220,25 +219,25 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
 
                                             if (edtPondNumber.getText().toString().equalsIgnoreCase("")) {
                                                 edtPondNumber.requestFocus();
-                                            }else if (edtSpecie.getText().toString().equalsIgnoreCase("")) {
+                                            } else if (edtSpecie.getText().toString().equalsIgnoreCase("")) {
                                                 edtSpecie.requestFocus();
-                                            }else if (edtABW.getText().toString().equalsIgnoreCase("")) {
+                                            } else if (edtABW.getText().toString().equalsIgnoreCase("")) {
                                                 edtABW.requestFocus();
-                                            }else if (edtSurvivalRate.getText().toString().equalsIgnoreCase("")) {
+                                            } else if (edtSurvivalRate.getText().toString().equalsIgnoreCase("")) {
                                                 edtSurvivalRate.requestFocus();
-                                            }else if (edtDateStocked.getText().toString().equalsIgnoreCase("")) {
+                                            } else if (edtDateStocked.getText().toString().equalsIgnoreCase("")) {
                                                 edtDateStocked.requestFocus();
-                                            }else if (edtQuantity.getText().toString().equalsIgnoreCase("")) {
+                                            } else if (edtQuantity.getText().toString().equalsIgnoreCase("")) {
                                                 edtQuantity.requestFocus();
-                                            }else if (edtCultureSystem.getText().toString().equalsIgnoreCase("")) {
+                                            } else if (edtCultureSystem.getText().toString().equalsIgnoreCase("")) {
                                                 edtCultureSystem.requestFocus();
-                                            }else if (edtRemarks.getText().toString().equalsIgnoreCase("")) {
+                                            } else if (edtRemarks.getText().toString().equalsIgnoreCase("")) {
                                                 edtRemarks.requestFocus();
                                             }
                                         }
 
                                     });
-                                }else{
+                                } else {
 
                                     final Dialog x = Helper.createCustomDialogThemedYesNO(activity, "Save all information on database?", "Save", "NO", "YES",
                                             R.color.green_400);
@@ -256,7 +255,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
                                         @Override
                                         public void onClick(View v) {
                                             x.hide();
-                                            updateCustomerInfoDB(id, Helper.variables.URL_UPDATE_PONDINFO_BY_ID);
+                                            updateCustomerInfoDB();
                                         }
                                     });
                                 }
@@ -268,7 +267,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
         });
     }
 
-    public void updateCustomerInfoDB(final int id2, final String url) {
+    public void updateCustomerInfoDB() {
         Log.d("DB", "before query "+id);
         int res = db.updatePondInfo(id+"", edtPondNumber.getText().toString(), edtSpecie.getText().toString(), edtABW.getText().toString(),
                 edtSurvivalRate.getText().toString(), edtDateStocked.getText().toString(), edtQuantity.getEditableText().toString(), edtArea.getText().toString(),

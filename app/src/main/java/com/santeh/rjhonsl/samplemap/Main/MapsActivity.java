@@ -68,28 +68,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     ProgressDialog PD;
     boolean isDrawerOpen = false;
 
-
     PopupWindow popUp;
     LinearLayout layout;
-    TextView tvBottomPopUp;
+
     ViewGroup.LayoutParams params;
     LinearLayout mainLayout;
-
     Location mLastLocation;
-
     String username, firstname, lastname, userdescription;
-    int userlevel, userid;
-
+    int userlevel, userid, zoom = 15, activeFilter;
     DrawerLayout drawerLayout;
-
     ImageButton btn_add_marker, btn_cancelAddmarker;
     ActionBarDrawerToggle drawerListener;
-
     Marker clickedMarker;
 
     double curlat, curLong;
-    int zoom = 15,
-        activeFilter;
 
     Activity activity;
     Context context;
@@ -98,12 +90,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     LatLng curLatlng, lastlatlng;
 
-    TextView textView;
-    TextView nav_fingerlings, nav_customerAddress, nav_sperms, nav_logout, nav_maptype, nav_displayAllMarkers, nav_settings, nav_growout,nav_usermonitoring, txtusername;
+    TextView  tvBottomPopUp, txtViewTop, nav_fingerlings, nav_customerAddress, nav_sperms, nav_logout, nav_maptype, nav_displayAllMarkers, nav_settings, nav_growout,nav_usermonitoring, txtusername;
 
     String activeSelection;
-
-
     List<CustInfoObject> custInfoObjectList;
 
     Bundle extrass;
@@ -159,7 +148,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         btn_cancelAddmarker = (ImageButton) findViewById(R.id.btnCloseAddMarker);
         nav_growout = (TextView) findViewById(R.id.txt_Nav_growOut);
         nav_logout = (TextView) findViewById(R.id.txt_Nav_logout);
-        textView = (TextView) findViewById(R.id.latLong);
+        txtViewTop = (TextView) findViewById(R.id.latLong);
         nav_usermonitoring = (TextView) findViewById(R.id.txt_Nav_UserMonitoring);
         txtusername = (TextView) findViewById(R.id.username);
 
@@ -229,6 +218,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
         maps = map;
+
+        txtViewTop.setText("You have unsynced data!");
 
         ((Var) this.getApplication()).setGoogleMap(map);
 
@@ -757,7 +748,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onLocationChanged(Location location) {
-        textView.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+//        txtViewTop.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
     }
 
 
@@ -766,7 +757,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            textView.setText(mLastLocation.getLatitude()+" "+mLastLocation.getLongitude());
+//            txtViewTop.setText(mLastLocation.getLatitude() + " " + mLastLocation.getLongitude());
         }
     }
 
@@ -948,7 +939,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 Log.d("DEBUG", "before active selection"+ activeSelection);
-                if (activeSelection=="farm"){
+                if (activeSelection.equalsIgnoreCase("farm")){
                     updateDisplay();
                 }
                 PD.dismiss();
@@ -1269,11 +1260,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     protected void updateDisplay() {
-        Log.d("UPDATE DISPLAY", "CUSTINFOOBJECT");
         if (custInfoObjectList != null) {
-            Log.d("UPDATE DISPLAY", "not null");
             if (custInfoObjectList.size() > 0) {
-                Log.d("UPDATE DISPLAY", "not zero");
                 for (int i = 0; i < custInfoObjectList.size(); i++) {
                     final CustInfoObject ci;
                     ci = custInfoObjectList.get(i);
