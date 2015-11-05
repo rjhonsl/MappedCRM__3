@@ -15,13 +15,14 @@
 
         <ImageButton
             android:layout_weight="1"
+            android:id="@+id/btn_title_left"
             android:background="@drawable/bg_material_transparent"
             android:src="@drawable/ic_keyboard_arrow_left_white_24dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text="Edit Pond"
+            android:text="Case Details"
             android:gravity="center"
             android:id="@+id/title"
             android:textSize="19sp"

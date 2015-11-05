@@ -76,6 +76,8 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     int userlvl;
     private int dd, mm, yyyy;
 
+    LinearLayout ll_btnHolder_bottom;
+
 
 
     @Override
@@ -143,6 +145,13 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         llCivilStatus = (LinearLayout) findViewById(R.id.ll_civilStatus);
         llSpouseFullname = (LinearLayout) findViewById(R.id.ll_spouseFullname);
         llSpouseBirthday = (LinearLayout) findViewById(R.id.ll_spouseBirthday);
+        ll_btnHolder_bottom = (LinearLayout) findViewById(R.id.ll_bottombutton);
+
+        if (Helper.variables.getGlobalVar_currentLevel(activity) == 4){
+            ll_btnHolder_bottom.setVisibility(View.VISIBLE);
+        }else{
+            ll_btnHolder_bottom.setVisibility(View.GONE);
+        }
 
 
         if (getIntent() != null) {

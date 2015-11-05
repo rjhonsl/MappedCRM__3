@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.santeh.rjhonsl.samplemap.APIs.MyVolleyAPI;
 import com.santeh.rjhonsl.samplemap.Adapter.Adapter_Growouts_PondWeekLyConsumption;
 import com.santeh.rjhonsl.samplemap.DBase.GpsDB_Query;
+import com.santeh.rjhonsl.samplemap.DBase.GpsSQLiteHelper;
 import com.santeh.rjhonsl.samplemap.Obj.CustInfoObject;
 import com.santeh.rjhonsl.samplemap.Parsers.PondWeeklyUpdateParser;
 import com.santeh.rjhonsl.samplemap.R;
@@ -51,8 +53,8 @@ public class Activity_PondWeeklyConsumption extends Activity {
 
     TextView txtheadr, txtdateStocked, txtQuantity;
 
-    List<CustInfoObject> pondInfoList;
     List<CustInfoObject> pondweeklyList;
+    List<CustInfoObject> finalWeekList;
 
     ImageButton btn_details, btn_addreport;
 
@@ -73,6 +75,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
     int startWeek, currentweek;
 
     GpsDB_Query db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +129,6 @@ public class Activity_PondWeeklyConsumption extends Activity {
         btn_details.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 final Dialog d = new Dialog(activity);//
                 d.requestWindowFeature(Window.FEATURE_NO_TITLE); //notitle
@@ -229,80 +231,86 @@ public class Activity_PondWeeklyConsumption extends Activity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                if (position==0) {
-                    Helper.createCustomThemedDialogOKOnly(activity, "Warning", "You cannot Edit or Delete Initial Stocking Data", "OK", R.color.red);
-                }else {
-                    String[] options = {"Edit ABW and Remarks", "Delete"};
-                    final Dialog d = Helper.createCustomThemedListDialog(activity, options, "Options ", R.color.deepteal_400);
-                    d.show();
+                if (Helper.variables.getGlobalVar_currentLevel(activity) == 4){
+                    if (position==0) {
+                        Helper.createCustomThemedDialogOKOnly(activity, "Warning", "You cannot Edit or Delete Initial Stocking Data", "OK", R.color.red);
+                    }else {
+                        String[] options = {"Edit ABW and Remarks", "Delete"};
+                        final Dialog d = Helper.createCustomThemedListDialog(activity, options, "Options ", R.color.deepteal_400);
+                        d.show();
 
-                    ListView lvOptions = (ListView) d.findViewById(R.id.dialog_list_listview);
-                    lvOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position1, long id) {
-                            if (position1 == 0 ){
+                        ListView lvOptions = (ListView) d.findViewById(R.id.dialog_list_listview);
+                        lvOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position1, long id) {
+                                if (position1 == 0 ){
 
-                                d.hide();
+                                    d.hide();
 
-                                final Dialog d2 = new Dialog(activity);//
-                                d2.requestWindowFeature(Window.FEATURE_NO_TITLE); //notitle
-                                d2.setContentView(R.layout.dialog_material_themed_addpondreport);//Set the xml view of the dialog
-                                Button add = (Button) d2.findViewById(R.id.btnAdd);
-                                TextView txttitle = (TextView) d2.findViewById(R.id.txtTitle);
-                                txttitle.setText("Edit Week Details ");
-                                add.setText("UPDATE");
+                                    final Dialog d2 = new Dialog(activity);//
+                                    d2.requestWindowFeature(Window.FEATURE_NO_TITLE); //notitle
+                                    d2.setContentView(R.layout.dialog_material_themed_addpondreport);//Set the xml view of the dialog
+                                    Button add = (Button) d2.findViewById(R.id.btnAdd);
+                                    TextView txttitle = (TextView) d2.findViewById(R.id.txtTitle);
+                                    txttitle.setText("Edit Week Details ");
+                                    add.setText("UPDATE");
 
-                                Button cancel = (Button) d2.findViewById(R.id.btnCancel);
-                                final EditText edtAbw = (EditText) d2.findViewById(R.id.edtAbw);
-                                final EditText edtRemarks = (EditText) d2.findViewById(R.id.edtRemarks);
+                                    Button cancel = (Button) d2.findViewById(R.id.btnCancel);
+                                    final EditText edtAbw = (EditText) d2.findViewById(R.id.edtAbw);
+                                    final EditText edtRemarks = (EditText) d2.findViewById(R.id.edtRemarks);
 
-                                edtAbw.setText(""+ pondweeklyList.get(position).getSizeofStock());
-                                edtRemarks.setText(""+ pondweeklyList.get(position).getRemarks());
+                                    edtAbw.setText(""+ pondweeklyList.get(position).getSizeofStock());
+                                    edtRemarks.setText(""+ pondweeklyList.get(position).getRemarks());
 
-                                d2.show();
-                                add.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        d2.hide();
-                                        modifyWeeklyDetail(pondweeklyList.get(position).getId() + "", edtRemarks.getText().toString(), edtAbw.getText().toString(),
-                                                Helper.variables.URL_UPDATE_POND_WEEKLY_DETAIL_BY_ID);
-                                    }
-                                });
+                                    d2.show();
+                                    add.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            d2.hide();
+                                            modifyWeeklyDetail(pondweeklyList.get(position).getId() + "", edtRemarks.getText().toString(), edtAbw.getText().toString(),
+                                                    Helper.variables.URL_UPDATE_POND_WEEKLY_DETAIL_BY_ID);
+                                        }
+                                    });
 
-                                cancel.setOnClickListener(new View.OnClickListener() {
-                                    @Override public void onClick(View v) {
-                                        d2.hide();
-                                    }
-                                });
+                                    cancel.setOnClickListener(new View.OnClickListener() {
+                                        @Override public void onClick(View v) {
+                                            d2.hide();
+                                        }
+                                    });
 
-                            }else if (position1 == 1){
-                                d.hide();
-                                final Dialog del = Helper.createCustomDialogThemedYesNO(activity, "Are you sure you want to delete selected week?", "Delete", "NO", "DELETE", R.color.red);
-                                del.show();
+                                }else if (position1 == 1){
+                                    d.hide();
+                                    final Dialog del = Helper.createCustomDialogThemedYesNO(activity, "Are you sure you want to delete selected week?", "Delete", "NO", "DELETE", R.color.red);
+                                    del.show();
 
-                                Button cancel = (Button) del.findViewById(R.id.btn_dialog_yesno_opt1);
-                                Button delete = (Button) del.findViewById(R.id.btn_dialog_yesno_opt2);
-                                delete.setTextColor(getResources().getColor(R.color.red));
+                                    Button cancel = (Button) del.findViewById(R.id.btn_dialog_yesno_opt1);
+                                    Button delete = (Button) del.findViewById(R.id.btn_dialog_yesno_opt2);
+                                    delete.setTextColor(getResources().getColor(R.color.red));
 
-                                cancel.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        del.hide();
-                                    }
-                                });
+                                    cancel.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            del.hide();
+                                        }
+                                    });
 
-                                delete.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        del.hide();
-                                        modifyWeeklyDetail(pondweeklyList.get(position).getId() + "","none", "none",
-                                                Helper.variables.URL_DELETE_POND_WEEKLY_DETAILS_BY_ID);
-                                    }
-                                });
-
+                                    delete.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            del.hide();
+                                            if (db.deleteRow_Weekly(pondweeklyList.get(position).getId() + "")) {
+                                                Helper.toastShort(activity, "Deleted successfully");
+                                                finish();
+                                            } else {
+                                                Helper.toastShort(activity, "Delete failed. Try again.");
+                                                finish();
+                                            }
+                                        }
+                                    });
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
                 return false;
             }
@@ -328,110 +336,132 @@ public class Activity_PondWeeklyConsumption extends Activity {
         lvPonds = (ListView) findViewById(R.id.lv_pond_weeklyReports);
         btn_details = (ImageButton) findViewById(R.id.btn_details);
         btn_addreport = (ImageButton) findViewById(R.id.btn_addreport);
+        if (Helper.variables.getGlobalVar_currentLevel(activity) == 4) {
+            btn_addreport.setVisibility(View.VISIBLE);
+        }else{
+            btn_addreport.setVisibility(View.GONE);
+        }
     }
 
 
 
     public void getpondData( final int pondid, String url) {
+        if (Helper.variables.getGlobalVar_currentLevel(activity) == 4) {
 
-        PD.setMessage("Retrieving Data. Please wait... ");
-        PD.show();
-
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        pondweeklyList = new ArrayList<>();
-                        PD.dismiss();
-
-                        if (!response.substring(1,2).equalsIgnoreCase("0")) {
-                            pondInfoList = PondWeeklyUpdateParser.parseFeed(response);
-                            if (pondInfoList!=null) {
-                                if (pondInfoList.size() > 0){
-                                    Log.d("null", "before for");
-
-                                    for (int i = 0; i < pondInfoList.size(); i++) {
-
-                                        CustInfoObject weekinfo1 = new CustInfoObject();
-
-
-                                        strRemarks = pondInfoList.get(i).getRemarks();
-                                        strabw = pondInfoList.get(i).getSizeofStock();
-
-
-                                        if (specie.equalsIgnoreCase("tilapia")){
-                                            strweeknum = Helper.get_Tilapia_WeekNum_byABW(strabw);
-                                        }else if (specie.equalsIgnoreCase("bangus")){
-                                            strweeknum = Helper.get_Bangus_WeekNum_byABW(strabw);
-                                        }else if (specie.equalsIgnoreCase("vannamei")){
-                                            strweeknum = Helper.get_Bangus_WeekNum_byABW(strabw);
-                                        }
-
-
-                                        strrecommended = (Double.parseDouble(Helper.computeWeeklyFeedConsumption(Double.parseDouble(strabw + ""), quantity,
-                                                Helper.get_TilapiaFeedingRate_by_WeekNum(strweeknum),
-                                                (Double.parseDouble(survivalrate) / 100)))/1000)+"";
-                                        if (specie.equalsIgnoreCase("tilapia")){
-                                            strFeedtype = Helper.getTilapiaTypeByNumberOfWeeks(Helper.get_Tilapia_WeekNum_byABW(strabw));
-                                        }else if (specie.equalsIgnoreCase("bangus")) {
-                                            strFeedtype = Helper.getBangusFeedtypeByABW(strabw);
-                                        }
-
-
-                                        weekinfo1.setId(pondInfoList.get(i).getId());
-                                        weekinfo1.setRemarks(strRemarks);
-                                        weekinfo1.setSizeofStock(strabw);
-                                        weekinfo1.setWeek(strweeknum);
-                                        weekinfo1.setRecommendedConsumption(strrecommended);
-                                        weekinfo1.setCurrentFeedType(strFeedtype);
-
-//                                        Log.d("null", strRemarks + " x " + strabw + " x " + strweeknum + " x " + strrecommended + " x " + strFeedtype);
-
-                                        pondweeklyList.add(weekinfo1);
-                                        Log.d("null", "end of loop");
-                                    }//end of loop
-                                }
-                            }
-
-
-                        }else {
-//                            Helper.toastShort(activity, "No records");
-                        }
-
-
-                        adapterPondWeeklyReport = new Adapter_Growouts_PondWeekLyConsumption(Activity_PondWeeklyConsumption.this,
-                                R.layout.item_lv_weeklyreport_allfeeddemands, pondweeklyList);
-                        lvPonds.setAdapter(adapterPondWeeklyReport);
-
-                        scrollMyListViewToBottom(lvPonds, adapterPondWeeklyReport, pondweeklyList.size());
+            Cursor cur = db.getLocal_PondWeeklyUpdates(id+"");
+            if (cur != null){
+                if (cur.getCount() > 0) {
+                    pondweeklyList = new ArrayList<>();
+                    finalWeekList = new ArrayList<>();
+                    Log.d("DB", "get count" +id + " " + cur.getCount());
+                    while (cur.moveToNext()) {
+                        CustInfoObject custInfoObject = new CustInfoObject();
+                        custInfoObject.setId(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_ID)));
+                        custInfoObject.setSizeofStock(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_CURRENT_ABW)));
+                        custInfoObject.setRemarks(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_REMARKS)));
+                        custInfoObject.setPondID(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_PONDID)));
+                        custInfoObject.setDateStocked(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_DATEADDED)));
+                        pondweeklyList.add(custInfoObject);
                     }
 
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                PD.dismiss();
-                Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
-                d.show();
+                    populatePondUpdatesListView();
+                    adapterPondWeeklyReport = new Adapter_Growouts_PondWeekLyConsumption(Activity_PondWeeklyConsumption.this,
+                            R.layout.item_lv_weeklyreport_allfeeddemands, finalWeekList);
+                    lvPonds.setAdapter(adapterPondWeeklyReport);
+                    scrollMyListViewToBottom(lvPonds, adapterPondWeeklyReport, pondweeklyList.size());
+                }
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
 
-                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
-                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
-                params.put("deviceid", Helper.getMacAddress(context));
-                params.put("pondindex", id+"");
-                return params;
-            }
-        };
+        }else{
+            PD.setMessage("Retrieving Data. Please wait... ");
+            PD.show();
+            StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            pondweeklyList = new ArrayList<>();
+                            finalWeekList = new ArrayList<>();
+                            PD.dismiss();
 
-        MyVolleyAPI api = new MyVolleyAPI();
-        api.addToReqQueue(postRequest, context);
+                            if (!response.substring(1,2).equalsIgnoreCase("0")) {
+                                pondweeklyList = PondWeeklyUpdateParser.parseFeed(response);
+                                populatePondUpdatesListView();
+                            }else {
+//                            Helper.toastShort(activity, "No records");
+                            }
+                            adapterPondWeeklyReport = new Adapter_Growouts_PondWeekLyConsumption(Activity_PondWeeklyConsumption.this,
+                                    R.layout.item_lv_weeklyreport_allfeeddemands, finalWeekList);
+                            lvPonds.setAdapter(adapterPondWeeklyReport);
 
+                            scrollMyListViewToBottom(lvPonds, adapterPondWeeklyReport, pondweeklyList.size());
+                        }
+
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    PD.dismiss();
+                    Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
+                    d.show();
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                    params.put("deviceid", Helper.getMacAddress(context));
+                    params.put("pondindex", id+"");
+                    return params;
+                }
+            };
+
+            MyVolleyAPI api = new MyVolleyAPI();
+            api.addToReqQueue(postRequest, context);
+        }
     }
 
+    private void populatePondUpdatesListView() {
+        if (pondweeklyList!=null) {
+            if (pondweeklyList.size() > 0){
+                Log.d("null", "before for");
 
+                for (int i = 0; i < pondweeklyList.size(); i++) {
+
+                    CustInfoObject weekinfo1 = new CustInfoObject();
+
+                    strRemarks = pondweeklyList.get(i).getRemarks();
+                    strabw = pondweeklyList.get(i).getSizeofStock();
+
+                    if (specie.equalsIgnoreCase("tilapia")){
+                        strweeknum = Helper.get_Tilapia_WeekNum_byABW(strabw);
+                    }else if (specie.equalsIgnoreCase("bangus")){
+                        strweeknum = Helper.get_Bangus_WeekNum_byABW(strabw);
+                    }else if (specie.equalsIgnoreCase("vannamei")){
+                        strweeknum = Helper.get_Bangus_WeekNum_byABW(strabw);
+                    }
+
+                    strrecommended = (Double.parseDouble(Helper.computeWeeklyFeedConsumption(Double.parseDouble(strabw + ""), quantity,
+                            Helper.get_TilapiaFeedingRate_by_WeekNum(strweeknum),
+                            (Double.parseDouble(survivalrate) / 100)))/1000)+"";
+                    if (specie.equalsIgnoreCase("tilapia")){
+                        strFeedtype = Helper.getTilapiaTypeByNumberOfWeeks(Helper.get_Tilapia_WeekNum_byABW(strabw));
+                    }else if (specie.equalsIgnoreCase("bangus")) {
+                        strFeedtype = Helper.getBangusFeedtypeByABW(strabw);
+                    }
+
+                    weekinfo1.setId(pondweeklyList.get(i).getId());
+                    weekinfo1.setRemarks(strRemarks);
+                    weekinfo1.setSizeofStock(strabw);
+                    weekinfo1.setWeek(strweeknum);
+                    weekinfo1.setRecommendedConsumption(strrecommended);
+                    weekinfo1.setCurrentFeedType(strFeedtype);
+//                                        Log.d("null", strRemarks + " x " + strabw + " x " + strweeknum + " x " + strrecommended + " x " + strFeedtype);
+                    finalWeekList.add(weekinfo1);
+                    Log.d("null", "end of loop");
+                }//end of loop
+            }
+        }
+    }
 
 
     private void AddReport(final String abw2, String url, final String remarks2){
@@ -447,6 +477,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
         final long result = db.insertWeeklyUpdates(abw2, remarks2, id+"", Helper.getDateDBformat());
 
         if (result != -1){
+            PD.dismiss();
             final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_PondWeeklyConsumption.this,
                     "Success", "Saving successful", "OK", R.color.skyblue_500);
             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
@@ -455,7 +486,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
                 @Override
                 public void onClick(View v) {
                     d.hide();
-                    PD.dismiss();
+
                     Logging.loguserAction(activity, activity.getBaseContext(),
                             Helper.userActions.TSR.ADD_WEEKLYREPORT + ":" + result + "-" + Helper.variables.getGlobalVar_currentUserID(activity) + "-" + abw2 +"-" +remarks2,
                             Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
@@ -465,6 +496,7 @@ public class Activity_PondWeeklyConsumption extends Activity {
                 }
             });
         }else{
+            PD.dismiss();
             final Dialog d = Helper.createCustomThemedDialogOKOnly(Activity_PondWeeklyConsumption.this,
                     "Error", "Reporting failed. Please Try Again. ", "OK", R.color.red);
             TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
@@ -523,41 +555,51 @@ public class Activity_PondWeeklyConsumption extends Activity {
         PD.setMessage("Updating database. Please wait... ");
         PD.show();
 
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url2,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        pondweeklyList = new ArrayList<>();
-                        PD.dismiss();
-                        if (!response.substring(1,2).equalsIgnoreCase("0")) {
-                            Helper.toastShort(activity, "Success");
-                            getpondData(id, Helper.variables.URL_SELECT_POND_WEEKLY_UPDATES_BY_ID);
-                        }else { Helper.toastShort(activity, "Something went wrong. Please try again later"); }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                PD.dismiss();
-                Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
-                d.show();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
+        int res = db.updateRowWeeklyUpdates(idToBeDeleted, abw1, remarks1);
+        if (res > 0) {
+            PD.dismiss();
+            Helper.createCustomThemedDialogOKOnly(activity, "Success", "You have successfully updated the record", "OK", R.color.blue);
+            getpondData(id, "");
+        }else{
+            PD.dismiss();
+            Helper.createCustomThemedDialogOKOnly(activity, "Error", "Updating failed. Please try again.", "OK", R.color.red);
+        }
 
-                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
-                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
-                params.put("deviceid", Helper.getMacAddress(context));
-                params.put("pondindex", idToBeDeleted+"");
-                params.put("abw",       abw1+"");
-                params.put("remarks",   remarks1+"");
-                return params;
-            }
-        };
-
-        MyVolleyAPI api = new MyVolleyAPI();
-        api.addToReqQueue(postRequest, context);
+//        StringRequest postRequest = new StringRequest(Request.Method.POST, url2,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        pondweeklyList = new ArrayList<>();
+//                        PD.dismiss();
+//                        if (!response.substring(1,2).equalsIgnoreCase("0")) {
+//                            Helper.toastShort(activity, "Success");
+//                            getpondData(id, Helper.variables.URL_SELECT_POND_WEEKLY_UPDATES_BY_ID);
+//                        }else { Helper.toastShort(activity, "Something went wrong. Please try again later"); }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                PD.dismiss();
+//                Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something unexpected happened: " + error.toString(), "OK", R.color.red);
+//                d.show();
+//            }
+//        }) {
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<>();
+//
+//                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+//                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+//                params.put("deviceid", Helper.getMacAddress(context));
+//                params.put("pondindex", idToBeDeleted+"");
+//                params.put("abw",       abw1+"");
+//                params.put("remarks",   remarks1+"");
+//                return params;
+//            }
+//        };
+//
+//        MyVolleyAPI api = new MyVolleyAPI();
+//        api.addToReqQueue(postRequest, context);
     }
 
     @Override

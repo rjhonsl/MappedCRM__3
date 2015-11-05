@@ -466,16 +466,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void run() {
                             curLatlng = fusedLocation.getLastKnowLocation();
-                            if (mapcircle == null || !mapcircle.isVisible()){
-                                circleOptions_addLocation = Helper.addCircle(activity, curLatlng, 1, R.color.skyblue_20,
-                                        R.color.skyblue_20, 1000);
-                                mapcircle = maps.addCircle(circleOptions_addLocation);
-                            }
-                            btn_cancelAddmarker.setVisibility(View.VISIBLE);
+
                             moveCameraAnimate(map, new LatLng(curLatlng.latitude, curLatlng.longitude), 15);
                             handler1.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
+                                    if (mapcircle == null || !mapcircle.isVisible()){
+                                        circleOptions_addLocation = Helper.addCircle(activity, curLatlng, 1, R.color.skyblue_20,
+                                                R.color.skyblue_20, 1000);
+                                        mapcircle = maps.addCircle(circleOptions_addLocation);
+                                    }
+                                    btn_cancelAddmarker.setVisibility(View.VISIBLE);
                                     Helper.createCustomThemedDialogOKOnly(activity, "Add Marker", "Long press any location within 1000 meters of your current location to Add a Marker.", "OK", R.color.blue);
                                 }
                             }, 1200);

@@ -11,6 +11,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -48,6 +49,8 @@ public class Activity_FarmInfo_Edit extends Activity{
 
     Activity activity;
     Context context;
+
+    ImageButton btnback;
 
     GpsDB_Query db;
 
@@ -264,6 +267,13 @@ public class Activity_FarmInfo_Edit extends Activity{
                 });
             }
         });
+
+        btnback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void initXmlViews() {
@@ -275,6 +285,8 @@ public class Activity_FarmInfo_Edit extends Activity{
         btnSaveChanges = (Button) findViewById(R.id.btn_markerdetail_OK);
         btnDelete = (Button) findViewById(R.id.btn_markerdetail_Delete);
         ll = (LinearLayout) findViewById(R.id.ll_buttonHolder);
+
+        btnback = (ImageButton) findViewById(R.id.title);
 
         edtContactname = (EditText) findViewById(R.id.txt_markerdetails_contactName);
         edtCompany = (EditText) findViewById(R.id.txt_markerdetails_company);

@@ -4,23 +4,25 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:orientation="horizontal"
         android:id="@+id/ll_titlebar"
         android:background="@color/accent_material_light">
 
         <ImageButton android:layout_width="wrap_content"
-                     android:layout_centerHorizontal="true"
-                     android:layout_centerVertical="true"
                      android:padding="5dp"
+                     android:layout_weight="1"
+                     android:id="@+id/title_back"
                      android:layout_height="wrap_content"
                      android:background="@drawable/bg_material_transparent"
                      android:layout_alignParentLeft="true"
                      android:src="@drawable/ic_keyboard_arrow_left_white_24dp"/>
 
         <TextView
+            android:layout_weight="8"
             android:gravity="center"
             android:text="Weekly Reports"
             android:textSize="20sp"
@@ -28,9 +30,8 @@
             android:paddingLeft="0dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:id="@+id/title_back"
             android:textColor="@color/background_material_light"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
         <ImageButton android:layout_width="wrap_content"
@@ -40,10 +41,11 @@
                      android:layout_height="wrap_content"
                      android:background="@drawable/bg_material_transparent"
                      android:layout_alignParentRight="true"
+                     android:layout_weight="1"
             android:src="@drawable/ic_filler24dp"/>
 
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <LinearLayout android:layout_width="fill_parent"
                   android:layout_height="wrap_content"

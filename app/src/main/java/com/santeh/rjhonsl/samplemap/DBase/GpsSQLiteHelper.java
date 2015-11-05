@@ -10,7 +10,7 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 	private static final String LOGTAG = "DB_GPS";
 	private static final String DATABASE_NAME = "local.db";
 	//each time you change data structure, you must increment this by 1
-	private static final int DATABASE_VERSION = 10;
+	private static final int DATABASE_VERSION = 11;
 
 	//Reference for tblmaincustomerinfo
 	public static final String TBLMAINCUSTOMERINFO 				= "tblmaincustomerinfo";
@@ -160,11 +160,9 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 			CL_USER_ACTIVITY_LAT, CL_USER_ACTIVITY_LNG, CL_USER_ACTIVITY_DATETIME, CL_USER_ACTIVITY_ACTIONTYPE};
 
 
-
 	//////////////////////////////////////////////////////////////////
 	///////////// STRINGS FOR CREATING AND UPDATING TABLE ////////////
 	//////////////////////////////////////////////////////////////////
-
 	//Query to create tables
 	private static final String TBL_CREATE_MAINCUSTOMERINFO =
 			"CREATE TABLE " + TBLMAINCUSTOMERINFO + " " +

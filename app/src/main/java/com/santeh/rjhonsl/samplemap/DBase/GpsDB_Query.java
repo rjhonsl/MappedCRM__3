@@ -94,7 +94,7 @@ public class GpsDB_Query {
 		values.put(GpsSQLiteHelper.CL_POND_customerId, customerid);
 		values.put(GpsSQLiteHelper.CL_POND_isPosted, 0);
 		long id = db.insert(GpsSQLiteHelper.TBLPOND, null, values);
-		insertWeeklyUpdates(sizeofStock, remarks, pondid, dateStocked);
+		insertWeeklyUpdates(sizeofStock, remarks, id+"", dateStocked);
 		return id;
 	}
 
@@ -255,6 +255,17 @@ public class GpsDB_Query {
 	}
 
 
+	public Cursor getLocal_PondWeeklyUpdates(String pondid){
+		String query =
+				"SELECT tblpond_weeklyupdates.* FROM tblpond_weeklyupdates \n" +
+						"WHERE tblpond_weeklyupdates.wu_pondid = ?" +
+						"ORDER BY tblpond_weeklyupdates.wu_id ASC ;";
+
+		String[] params =  new String[] {pondid};
+		return db.rawQuery(query, params);
+	}
+
+
 	public Cursor getCUST_LOCATION_BY_indexID(String index){
 		String query = "Select tblmaincustomerinfo.* from tblmaincustomerinfo " +
 						"WHERE tblmaincustomerinfo.mci_id= "+index+";";
@@ -276,6 +287,14 @@ public class GpsDB_Query {
 			}
 		}
 		return  isexisting;
+	}
+	public Cursor getLocal_PondsByFarmIndex(String farmid){
+		dbhelper.getWritableDatabase();
+		String query = "SELECT * FROM `tblPond` WHERE `customerId`= ?\n" +
+			"ORDER BY CAST(`tblPond`.`pondid` AS SIGNED)  ASC";
+
+		String[] params = new String[] {farmid};
+		return db.rawQuery(query, params);
 	}
 
 
@@ -350,7 +369,6 @@ public class GpsDB_Query {
 	 ********************************************/
 	public int updateRowOneUser(String userid, String lvl, String firstname, String lastname, String username, String password, String deviceid, String dateAdded) {
 		String where = GpsSQLiteHelper.CL_USERS_ID + " = " + userid;
-
 		ContentValues newValues = new ContentValues();
 		newValues.put(GpsSQLiteHelper.CL_USERS_userlvl, lvl);
 		newValues.put(GpsSQLiteHelper.CL_USERS_firstName, firstname);
@@ -359,14 +377,32 @@ public class GpsDB_Query {
 		newValues.put(GpsSQLiteHelper.CL_USERS_password, password);
 		newValues.put(GpsSQLiteHelper.CL_USERS_deviceid, deviceid);
 		newValues.put(GpsSQLiteHelper.CL_USERS_dateAdded, dateAdded);
-
 		return 	db.update(GpsSQLiteHelper.TBLUSERS, newValues, where, null);
+	}
+
+
+	public int updatePondInfo(String index, String pondid, String specie, String sizeofStock, String survivalRate, String dateStocked, String quantity, String area, String cultureSystem,
+							  String remarks) {
+//		Log.d("DB", "db updates" + index + " " + pondid + " " + specie + " " + sizeofStock + " " + survivalRate + " " + dateStocked + " " +
+//				quantity + " "+ area + " " +cultureSystem + " " + remarks);
+		String where = GpsSQLiteHelper.CL_POND_INDEX + " = " + index;
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_POND_PID, pondid);
+		newValues.put(GpsSQLiteHelper.CL_POND_specie, specie);
+		newValues.put(GpsSQLiteHelper.CL_POND_sizeofStock, sizeofStock);
+		newValues.put(GpsSQLiteHelper.CL_POND_survivalrate, survivalRate);
+		newValues.put(GpsSQLiteHelper.CL_POND_dateStocked, dateStocked);
+		newValues.put(GpsSQLiteHelper.CL_POND_quantity, quantity);
+		newValues.put(GpsSQLiteHelper.CL_POND_area, area);
+		newValues.put(GpsSQLiteHelper.CL_POND_culturesystem, cultureSystem);
+		newValues.put(GpsSQLiteHelper.CL_POND_remarks, remarks);
+
+		return db.update(GpsSQLiteHelper.TBLPOND, newValues, where, null);
 	}
 
 
 	public int updateRowFarmInfo(String indexid, String contactname, String company, String address, String farmname, String farmid, String contactNumber, String cultSystem,
 								 String cultLevel, String WaterType ) {
-
 		String where = GpsSQLiteHelper.CL_FarmInfo_ID + " = " + indexid;
 		ContentValues newValues = new ContentValues();
 		newValues.put(GpsSQLiteHelper.CL_FARMINFO_CONTACT_NAME, contactname);
@@ -378,8 +414,16 @@ public class GpsDB_Query {
 		newValues.put(GpsSQLiteHelper.CL_FARMINFO_CULTYPE, cultSystem);
 		newValues.put(GpsSQLiteHelper.CL_FARMINFO_CULTlVL, cultLevel);
 		newValues.put(GpsSQLiteHelper.CL_FARMINFO_WATTYPE, WaterType);
-
 		return 	db.update(GpsSQLiteHelper.TBLFARMiNFO, newValues, where, null);
+	}
+
+
+	public int updateRowWeeklyUpdates( String indexid, String abw, String remarks) {
+		String where = GpsSQLiteHelper.CL_WEEKLY_UPDATES_ID + " = " + indexid;
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_WEEKLY_UPDATES_CURRENT_ABW, abw);
+		newValues.put(GpsSQLiteHelper.CL_WEEKLY_UPDATES_REMARKS, remarks);
+		return 	db.update(GpsSQLiteHelper.TBLPOND_WeeklyUpdates, newValues, where, null);
 	}
 
 	public int updateCustomerInfo(String id, String firstname, String lastname, String middleName, String farmID, String houseNumber, String street, String subdivision, String barangay,
@@ -412,7 +456,7 @@ public class GpsDB_Query {
 
 
 	/********************************************
-	 * 				DELETE						*
+	 * 				DELETEs						*
 	 ********************************************/
 
 	//Deletes row from Contacts
@@ -424,5 +468,19 @@ public class GpsDB_Query {
 	public boolean deleteRow_FarmInfo(String rowId) {
 		String where = GpsSQLiteHelper.CL_FarmInfo_ID + "=" + rowId;
 		return db.delete(GpsSQLiteHelper.TBLFARMiNFO, where, null) != 0;
+	}
+	public boolean deleteRow_Weekly(String rowId) {
+		String where = GpsSQLiteHelper.CL_WEEKLY_UPDATES_ID + "=" + rowId;
+		return db.delete(GpsSQLiteHelper.TBLPOND_WeeklyUpdates, where, null) != 0;
+	}
+
+	public boolean deleteRow_PondInfo(String rowId) {
+		String where = GpsSQLiteHelper.CL_POND_INDEX + "=" + rowId;
+		String where1 = GpsSQLiteHelper.CL_WEEKLY_UPDATES_ID + "=" + rowId;
+		boolean isdeleted = db.delete(GpsSQLiteHelper.TBLPOND, where, null) != 0;
+		if (isdeleted) {
+			isdeleted = db.delete(GpsSQLiteHelper.TBLPOND_WeeklyUpdates, where1, null) != 0;
+		}
+		return isdeleted;
 	}
 }

@@ -8,28 +8,22 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.google.android.gms.maps.model.LatLng;
-import com.santeh.rjhonsl.samplemap.APIs.MyVolleyAPI;
+import com.santeh.rjhonsl.samplemap.DBase.GpsDB_Query;
 import com.santeh.rjhonsl.samplemap.R;
 import com.santeh.rjhonsl.samplemap.Utils.FusedLocation;
 import com.santeh.rjhonsl.samplemap.Utils.Helper;
-import com.santeh.rjhonsl.samplemap.Utils.Logging;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by rjhonsl on 9/28/2015.
@@ -45,6 +39,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
 
     Activity activity;
     Context context;
+    ImageButton btn_back;
 
     FusedLocation fusedLocation;
     public static final String DATEPICKER_TAG = "datepicker";
@@ -52,6 +47,9 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
     DatePickerDialog datePickerDialog;
     int y, m, d;
 
+    GpsDB_Query db;
+    private int isposted;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +58,8 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
         PD.setCancelable(false);
         activity = this;
         context = Activity_EditPonds.this;
+        db = new GpsDB_Query(this);
+        db.open();
 
         fusedLocation = new FusedLocation(context, activity);
         fusedLocation.connectToApiClient();
@@ -67,6 +67,7 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
         if (getIntent() != null){
             if (getIntent().hasExtra("pondid")){ pondid = getIntent().getIntExtra("pondid",0); }
             if (getIntent().hasExtra("id")){id = getIntent().getIntExtra("id", 0);}
+            if (getIntent().hasExtra("isposted")){isposted = getIntent().getIntExtra("isposted", 0);}
             if (getIntent().hasExtra("abw")){ abw = getIntent().getIntExtra("abw", 0);}
             if (getIntent().hasExtra("survivalrate")){
                 survivalrate = getIntent().getStringExtra("survivalrate");
@@ -92,6 +93,20 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
         edtCultureSystem = (EditText) findViewById(R.id.edtCultureSystem);
         edtRemarks = (EditText) findViewById(R.id.edtRemarks);
         btnSave = (Button) findViewById(R.id.btnSave);
+        btn_back = (ImageButton) findViewById(R.id.btn_title_left);
+
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        if (Helper.variables.getGlobalVar_currentLevel(activity) == 4){
+            btnSave.setVisibility(View.VISIBLE);
+        }else{
+            btnSave.setVisibility(View.GONE);
+        }
 
 
         edtSpecie.setText(specie);
@@ -156,215 +171,242 @@ public class Activity_EditPonds extends FragmentActivity  implements DatePickerD
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fusedLocation.disconnectFromApiClient();
+                if (isposted == 1) {
+                    Helper.createCustomThemedDialogOKOnly(activity, "Oops", "This record is already finalized/posted. Please contact admin for concerns", "OK", R.color.red);
+                }else{
+                    fusedLocation.connectToApiClient();
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            LatLng currentloc = fusedLocation.getLastKnowLocation();
+                            LatLng farmlocat = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
-                fusedLocation.connectToApiClient();
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        LatLng currentloc = fusedLocation.getLastKnowLocation();
-                        LatLng farmlocat = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
-
-                        float[] results = new float[1];
-                        Location.distanceBetween(farmlocat.latitude, farmlocat.longitude,
-                                currentloc.latitude, currentloc.longitude, results);
+                            float[] results = new float[1];
+                            Location.distanceBetween(farmlocat.latitude, farmlocat.longitude,
+                                    currentloc.latitude, currentloc.longitude, results);
 //                        Helper.toastLong(activity, results[0]+"");
 
-                        if (results[0] > 1000) {
-                            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Out of range", "You must be near the farm to EDIT a new farm.", "OK", R.color.red);
-                            d.show();
-
-                            Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
-                            ok.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    d.hide();
-                                }
-                            });
-                        }else{
-
-                            if (edtPondNumber.getText().toString().equalsIgnoreCase("")
-                                    || edtSpecie.getText().toString().equalsIgnoreCase("")
-                                    || edtABW.getText().toString().equalsIgnoreCase("")
-                                    || edtSurvivalRate.getText().toString().equalsIgnoreCase("")
-                                    || edtDateStocked.getText().toString().equalsIgnoreCase("")
-                                    || edtQuantity.getText().toString().equalsIgnoreCase("")
-                                    || edtCultureSystem.getText().toString().equalsIgnoreCase("")
-                                    || edtRemarks.getText().toString().equalsIgnoreCase("")
-                                    ) {
-                                final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Message", "You have to complete all the following fields to continue.", "OK", R.color.red);
+                            if (results[0] > 1000) {
+                                final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Out of range", "You must be near the farm to EDIT a new farm.", "OK", R.color.red);
                                 d.show();
+
                                 Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
                                 ok.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         d.hide();
-
-                                        if (edtPondNumber.getText().toString().equalsIgnoreCase("")) {
-                                            edtPondNumber.requestFocus();
-                                        }else if (edtSpecie.getText().toString().equalsIgnoreCase("")) {
-                                            edtSpecie.requestFocus();
-                                        }else if (edtABW.getText().toString().equalsIgnoreCase("")) {
-                                            edtABW.requestFocus();
-                                        }else if (edtSurvivalRate.getText().toString().equalsIgnoreCase("")) {
-                                            edtSurvivalRate.requestFocus();
-                                        }else if (edtDateStocked.getText().toString().equalsIgnoreCase("")) {
-                                            edtDateStocked.requestFocus();
-                                        }else if (edtQuantity.getText().toString().equalsIgnoreCase("")) {
-                                            edtQuantity.requestFocus();
-                                        }else if (edtCultureSystem.getText().toString().equalsIgnoreCase("")) {
-                                            edtCultureSystem.requestFocus();
-                                        }else if (edtRemarks.getText().toString().equalsIgnoreCase("")) {
-                                            edtRemarks.requestFocus();
-                                        }
                                     }
-
                                 });
                             }else{
 
-                                final Dialog x = Helper.createCustomDialogThemedYesNO(activity, "Save all information on database?", "Save", "NO", "YES",
-                                        R.color.green_400);
-                                x.show();
-                                Button no = (Button) x.findViewById(R.id.btn_dialog_yesno_opt1);
-                                Button yes = (Button) x.findViewById(R.id.btn_dialog_yesno_opt2);
-                                no.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        x.hide();
-                                    }
-                                });
+                                if (edtPondNumber.getText().toString().equalsIgnoreCase("")
+                                        || edtSpecie.getText().toString().equalsIgnoreCase("")
+                                        || edtABW.getText().toString().equalsIgnoreCase("")
+                                        || edtSurvivalRate.getText().toString().equalsIgnoreCase("")
+                                        || edtDateStocked.getText().toString().equalsIgnoreCase("")
+                                        || edtQuantity.getText().toString().equalsIgnoreCase("")
+                                        || edtCultureSystem.getText().toString().equalsIgnoreCase("")
+                                        || edtRemarks.getText().toString().equalsIgnoreCase("")
+                                        ) {
+                                    final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Message", "You have to complete all the following fields to continue.", "OK", R.color.red);
+                                    d.show();
+                                    Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
+                                    ok.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            d.hide();
 
-                                yes.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        x.hide();
-                                        updateCustomerInfoDB(id, Helper.variables.URL_UPDATE_PONDINFO_BY_ID);
-                                    }
-                                });
+                                            if (edtPondNumber.getText().toString().equalsIgnoreCase("")) {
+                                                edtPondNumber.requestFocus();
+                                            }else if (edtSpecie.getText().toString().equalsIgnoreCase("")) {
+                                                edtSpecie.requestFocus();
+                                            }else if (edtABW.getText().toString().equalsIgnoreCase("")) {
+                                                edtABW.requestFocus();
+                                            }else if (edtSurvivalRate.getText().toString().equalsIgnoreCase("")) {
+                                                edtSurvivalRate.requestFocus();
+                                            }else if (edtDateStocked.getText().toString().equalsIgnoreCase("")) {
+                                                edtDateStocked.requestFocus();
+                                            }else if (edtQuantity.getText().toString().equalsIgnoreCase("")) {
+                                                edtQuantity.requestFocus();
+                                            }else if (edtCultureSystem.getText().toString().equalsIgnoreCase("")) {
+                                                edtCultureSystem.requestFocus();
+                                            }else if (edtRemarks.getText().toString().equalsIgnoreCase("")) {
+                                                edtRemarks.requestFocus();
+                                            }
+                                        }
 
+                                    });
+                                }else{
 
+                                    final Dialog x = Helper.createCustomDialogThemedYesNO(activity, "Save all information on database?", "Save", "NO", "YES",
+                                            R.color.green_400);
+                                    x.show();
+                                    Button no = (Button) x.findViewById(R.id.btn_dialog_yesno_opt1);
+                                    Button yes = (Button) x.findViewById(R.id.btn_dialog_yesno_opt2);
+                                    no.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            x.hide();
+                                        }
+                                    });
+
+                                    yes.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            x.hide();
+                                            updateCustomerInfoDB(id, Helper.variables.URL_UPDATE_PONDINFO_BY_ID);
+                                        }
+                                    });
+                                }
                             }
-
                         }
-                    }
-                }, 280);
-
-
-
-
+                    }, 280);
+                }
             }
         });
     }
 
     public void updateCustomerInfoDB(final int id2, final String url) {
+        Log.d("DB", "before query "+id);
+        int res = db.updatePondInfo(id+"", edtPondNumber.getText().toString(), edtSpecie.getText().toString(), edtABW.getText().toString(),
+                edtSurvivalRate.getText().toString(), edtDateStocked.getText().toString(), edtQuantity.getEditableText().toString(), edtArea.getText().toString(),
+                edtCultureSystem.getText().toString(), edtRemarks.getText().toString());
 
-        PD.setMessage("Saving Changes... ");
-        PD.show();
+        Log.d("DB", "row "+res);
+        if (res > 0) {
+            Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Success", "You have successfully updated the record", "OK", R.color.blue);
+            Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
+            ok.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }else {
+            Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something went wrong. Please try saving again", "OK", R.color.red);
+        }
 
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-
-                        String responseCode = Helper.extractResponseCode(response);
-                        String title, prompt;
-
-
-                        if (responseCode.equalsIgnoreCase("0")){
-                            oopsprompt();
-                        }else if (responseCode.equalsIgnoreCase("1")) {
-
-                            Logging.loguserAction(activity, activity.getBaseContext(), Helper.userActions.TSR.Edit_POND, Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
-                            title = "Update";
-                            prompt = "You have successfully updated database.";
-                            PD.dismiss();
-
-                            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, title,
-                                    prompt, "OK", R.color.skyblue_500);
-                            TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
-                            d.show();
-                            ok.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    d.hide();
-                                    finish();
-                                }
-                            });
-                        }
-                        else {
-                            oopsprompt();
-                        }
-
-                    }
-
-                    private void oopsprompt() {
-                        String title="OOPS";
-                        String prompt = "Something went wrong. Please try again later.";
-                        PD.dismiss();
-
-                        final Dialog d = Helper.createCustomDialogOKOnly(activity, title,
-                                prompt, "OK");
-                        TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
-                        d.setCancelable(false);
-                        d.show();
-                        ok.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                d.hide();
-                            }
-                        });
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                PD.dismiss();
-
-                final Dialog d = Helper.createCustomDialogOKOnly(activity, "OOPS",
-                        "Something went wrong. error( "+ error +" )", "OK");
-                TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
-                d.setCancelable(false);
-                d.show();
-                ok.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+//        PD.setMessage("Saving Changes... ");
+//        PD.show();
+//
+//        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//
+//                        String responseCode = Helper.extractResponseCode(response);
+//                        String title, prompt;
+//
+//
+//                        if (responseCode.equalsIgnoreCase("0")){
+//                            oopsprompt();
+//                        }else if (responseCode.equalsIgnoreCase("1")) {
+//
+//                            Logging.loguserAction(activity, activity.getBaseContext(), Helper.userActions.TSR.Edit_POND, Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
+//                            title = "Update";
+//                            prompt = "You have successfully updated database.";
+//                            PD.dismiss();
+//
+//                            final Dialog d = Helper.createCustomThemedDialogOKOnly(activity, title,
+//                                    prompt, "OK", R.color.skyblue_500);
+//                            TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
+//                            d.show();
+//                            ok.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    d.hide();
 //                                    finish();
-                        d.hide();
-                    }
-                });
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-
-                params.put("specie", String.valueOf(edtSpecie.getText()));
-                params.put("pondid", String.valueOf(edtPondNumber.getText()));
-                params.put("dateStocked", String.valueOf(edtDateStocked.getText()));
-                params.put("quantity", String.valueOf(edtQuantity.getText()));
-                params.put("area", String.valueOf(edtArea.getText()));
-                params.put("culturesystem", String.valueOf(edtCultureSystem.getText()));
-                params.put("remarks", String.valueOf(edtRemarks.getText()));
-                params.put("id", String.valueOf(id2));
-                params.put("sizeofStock", String.valueOf(edtABW.getText()));
-                params.put("survivalrate", String.valueOf(edtSurvivalRate.getText()));
-
-                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
-                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
-                params.put("deviceid", Helper.getMacAddress(activity));
-                return params;
-            }
-        };
-
-        // Adding request to request queue
-        MyVolleyAPI api = new MyVolleyAPI();
-        api.addToReqQueue(postRequest, context);
+//                                }
+//                            });
+//                        }
+//                        else {
+//                            oopsprompt();
+//                        }
+//
+//                    }
+//
+//                    private void oopsprompt() {
+//                        String title="OOPS";
+//                        String prompt = "Something went wrong. Please try again later.";
+//                        PD.dismiss();
+//
+//                        final Dialog d = Helper.createCustomDialogOKOnly(activity, title,
+//                                prompt, "OK");
+//                        TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
+//                        d.setCancelable(false);
+//                        d.show();
+//                        ok.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                d.hide();
+//                            }
+//                        });
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                PD.dismiss();
+//
+//                final Dialog d = Helper.createCustomDialogOKOnly(activity, "OOPS",
+//                        "Something went wrong. error( "+ error +" )", "OK");
+//                TextView ok = (TextView) d.findViewById(R.id.btn_dialog_okonly_OK);
+//                d.setCancelable(false);
+//                d.show();
+//                ok.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+////                                    finish();
+//                        d.hide();
+//                    }
+//                });
+//            }
+//        }) {
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<String, String>();
+//
+//                params.put("specie", String.valueOf(edtSpecie.getText()));
+//                params.put("pondid", String.valueOf(edtPondNumber.getText()));
+//                params.put("dateStocked", String.valueOf(edtDateStocked.getText()));
+//                params.put("quantity", String.valueOf(edtQuantity.getText()));
+//                params.put("area", String.valueOf(edtArea.getText()));
+//                params.put("culturesystem", String.valueOf(edtCultureSystem.getText()));
+//                params.put("remarks", String.valueOf(edtRemarks.getText()));
+//                params.put("id", String.valueOf(id2));
+//                params.put("sizeofStock", String.valueOf(edtABW.getText()));
+//                params.put("survivalrate", String.valueOf(edtSurvivalRate.getText()));
+//
+//                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+//                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+//                params.put("deviceid", Helper.getMacAddress(activity));
+//                return params;
+//            }
+//        };
+//
+//        // Adding request to request queue
+//        MyVolleyAPI api = new MyVolleyAPI();
+//        api.addToReqQueue(postRequest, context);
     }
 
     @Override
     public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-        edtDateStocked.setText((month + 1) + "/" + day + "/"+year);
+        edtDateStocked.setText( year + "-" + (month + 1) + "-"+day );
         y = year;
         m = month + 1;
         d = day;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        db.open();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        db.close();
     }
 }

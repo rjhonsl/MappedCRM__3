@@ -41,14 +41,15 @@ public class Activity_Add_FarmInformation extends Activity {
     String latitude, longtitude, id, imageName;
 
     ProgressDialog PD;
-    Button insert, btnOK,btnCancel, btnAddPond;
+    private Button btnOK,btnCancel, btnAddPond;
 
     ImageButton titleback;
     FusedLocation fusedLocation;
 
     GpsDB_Query db;
     GpsSQLiteHelper dbHelper;
-
+    private Button btnDelete;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +90,11 @@ public class Activity_Add_FarmInformation extends Activity {
         btnOK = (Button) findViewById(R.id.btn_markerdetail_OK);
         btnCancel = (Button) findViewById(R.id.btn_markerdetail_CANCEL);
         btnAddPond = (Button) findViewById(R.id.btn_markerdetail_ADDPOND);
+        btnDelete = (Button) findViewById(R.id.btn_markerdetail_Delete);
+
+        btnCancel.setVisibility(View.GONE);
+        btnAddPond.setVisibility(View.GONE);
+        btnDelete.setVisibility(View.GONE);
 
         txtCultureType.getBackground().setColorFilter(getResources().getColor(R.color.material_deep_teal_500), PorterDuff.Mode.SRC_IN);
         txtCultureLevel.getBackground().setColorFilter(getResources().getColor(R.color.material_deep_teal_500), PorterDuff.Mode.SRC_IN);

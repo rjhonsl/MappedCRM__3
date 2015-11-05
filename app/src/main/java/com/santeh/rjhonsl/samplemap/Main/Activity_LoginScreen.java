@@ -297,8 +297,8 @@ public class Activity_LoginScreen extends Activity{
         txtusername.getBackground().setColorFilter(getResources().getColor(R.color.yellow), PorterDuff.Mode.SRC_IN);
         txtpassword.getBackground().setColorFilter(getResources().getColor(R.color.yellow), PorterDuff.Mode.SRC_IN);
 
-        txtpassword.setText("10");
-        txtusername.setText("jhonar10");
+        txtpassword.setText("tsr");
+        txtusername.setText("tsr");
     }
 
     private void toggle_showpassword() {
@@ -365,7 +365,7 @@ public class Activity_LoginScreen extends Activity{
                                 }
                             }, 800);
                         }else{
-                            Helper.toastShort(activity, "Account is not available. Please contact admin.");
+                            Helper.toastShort(activity, "Wrong accout credentials please try again");
                         }
 
 
@@ -489,7 +489,7 @@ public class Activity_LoginScreen extends Activity{
     }
 
     private void exitApp() {
-        final Dialog d = Helper.createCustomDialogYesNO(activity, R.layout.dialog_material_yesno, "Do you wish to wish to exit the app?", "EXIT", "YES", "NO");
+        final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Do you wish to wish to exit the app?", "EXIT", "YES", "NO", R.color.red);
         d.show();
         Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
         Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
