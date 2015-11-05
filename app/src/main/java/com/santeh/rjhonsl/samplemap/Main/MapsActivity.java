@@ -220,6 +220,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         maps = map;
 
         txtViewTop.setText("You have unsynced data!");
+        txtViewTop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         ((Var) this.getApplication()).setGoogleMap(map);
 
