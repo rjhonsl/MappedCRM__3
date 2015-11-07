@@ -94,7 +94,7 @@ public class GpsDB_Query {
 		values.put(GpsSQLiteHelper.CL_POND_customerId, customerid);
 		values.put(GpsSQLiteHelper.CL_POND_isPosted, 0);
 		long id = db.insert(GpsSQLiteHelper.TBLPOND, null, values);
-		insertWeeklyUpdates(sizeofStock, remarks, id+"", dateStocked);
+		insertWeeklyUpdates(sizeofStock, remarks, id + "", dateStocked);
 		return id;
 	}
 
@@ -172,8 +172,6 @@ public class GpsDB_Query {
 		Cursor cur = db.rawQuery(query, params);
 		return cur.getCount();
 	}
-	
-	
 
 
 	/********************************************
@@ -187,6 +185,44 @@ public class GpsDB_Query {
 				;
 		String[] params = new String[] {username, password, deviceid };
 		return db.rawQuery(query, params);
+	}
+
+
+	public int getFarmInfo_notPosted_Count(){
+		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLFARMiNFO+" WHERE "
+				+ GpsSQLiteHelper.CL_FARMINFO_IsPosted + " = 0 "
+				;
+		String[] params = new String[] {};
+		Cursor cur = db.rawQuery(query, params);
+		return cur.getCount();
+	}
+
+
+	public int getCustInfo_notPosted_Count(){
+		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLMAINCUSTOMERINFO+" WHERE "
+				+ GpsSQLiteHelper.CL_MAINCUSTINFO_isposted+ " = 0 "
+				;
+		String[] params = new String[] {};
+		Cursor cur = db.rawQuery(query, params);
+		return cur.getCount();
+	}
+
+	public int getPond_notPosted_Count(){
+		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLPOND+" WHERE "
+				+ GpsSQLiteHelper.CL_POND_isPosted+ " = 0 "
+				;
+		String[] params = new String[] {};
+		Cursor cur = db.rawQuery(query, params);
+		return cur.getCount();
+	}
+
+	public int getWeeklyPosted_notPosted_Count(){
+		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLPOND_WeeklyUpdates+" WHERE "
+				+ GpsSQLiteHelper.CL_WEEKLY_UPDATES_isposted+ " = 0 "
+				;
+		String[] params = new String[] {};
+		Cursor cur = db.rawQuery(query, params);
+		return cur.getCount();
 	}
 
 	public Cursor getAll_FARMINFO_LEFTJOIN_PONDINFO_LEFTJOIN_CUSTOMERINFO(String userid){

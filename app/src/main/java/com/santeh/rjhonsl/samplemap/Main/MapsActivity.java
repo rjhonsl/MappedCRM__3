@@ -22,6 +22,8 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -219,11 +221,49 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.setMyLocationEnabled(true);
         maps = map;
 
-        txtViewTop.setText("You have unsynced data!");
+        if(Helper.variables.getGlobalVar_currentLevel(activity) == 4){
+            int farmIsPostedCount =  db.getFarmInfo_notPosted_Count(),
+                    custPostedCount = db.getCustInfo_notPosted_Count(),
+                    pondPostedCount = db.getPond_notPosted_Count(),
+                    weeklyPostedCount = db.getWeeklyPosted_notPosted_Count(),
+                    sum = farmIsPostedCount + custPostedCount + pondPostedCount + weeklyPostedCount;
+            if (farmIsPostedCount > 0  || custPostedCount > 0 || pondPostedCount > 0  || weeklyPostedCount > 0 ){
+                txtViewTop.setText("You have (" + sum + ") unsynced data!");
+                txtViewTop.setVisibility(View.VISIBLE);
+                Animation anim = new AlphaAnimation(0.7f, 1.0f);
+                anim.setDuration(800); //You can manage the blinking time with this parameter
+                anim.setStartOffset(20);
+                anim.setRepeatMode(Animation.REVERSE);
+                anim.setRepeatCount(Animation.INFINITE);
+                txtViewTop.startAnimation(anim);
+            }else{
+                txtViewTop.setVisibility(View.GONE);
+            }
+        }else{
+            txtViewTop.setVisibility(View.GONE);
+        }
+
         txtViewTop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Do you want to sync data to our server?", "Sync", "NO", "SYNC NOW", R.color.skyblue_500);
+                final Button btnNo = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
+                Button btnSync = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
+
+                btnNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        d.hide();
+                    }
+                });
+
+                btnSync.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
             }
         });
 
@@ -1028,8 +1068,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
-
     public void showAllCustomerLocation(){
         PD.setMessage("Please wait...");
         PD.show();
@@ -1461,6 +1499,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
     }
-
 
 }

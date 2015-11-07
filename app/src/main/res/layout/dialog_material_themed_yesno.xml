@@ -74,7 +74,7 @@
         <Button
             android:textColor="@color/material_deep_teal_500"
             android:textSize="13sp"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:background="@drawable/bg_material_transparent"
             android:text="NO"
@@ -82,7 +82,7 @@
         <Button
             android:textColor="@color/material_deep_teal_500"
             android:textSize="13sp"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:background="@drawable/bg_material_transparent"
             android:text="YES"
