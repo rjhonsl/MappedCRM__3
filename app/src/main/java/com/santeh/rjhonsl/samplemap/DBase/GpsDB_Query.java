@@ -1,5 +1,6 @@
 package com.santeh.rjhonsl.samplemap.DBase;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -187,10 +188,128 @@ public class GpsDB_Query {
 		return db.rawQuery(query, params);
 	}
 
+	public String getSQLStringForInsert_UNPOSTED_FARMINFO(Activity activity) {
+		String sqlString = "" +
+				"INSERT INTO `tblCustomerInfo` (`ci_customerId` , `latitude`, `longtitude`, `contact_name`, `company`, `address` , `farm_name` , `farmid` , `contact_number` , `culture_type` , `culture_level`, `water_type`, `dateAdded`, `addedby`, `lid`) VALUES ";
+		String query = "SELECT * FROM " + GpsSQLiteHelper.TBLFARMiNFO + " WHERE "
+				+ GpsSQLiteHelper.CL_FARMINFO_IsPosted + " = 0 AND " +
+				GpsSQLiteHelper.CL_FARMINFO_addedby + " = " + Helper.variables.getGlobalVar_currentUserID(activity);
+		String[] params = new String[]{};
+		Cursor cur = db.rawQuery(query, null);
 
-	public int getFarmInfo_notPosted_Count(){
+		if (cur.getCount() > 0) {
+			while (cur.moveToNext()) {
+
+				String contactName = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_CONTACT_NAME)).replaceAll("'", "\\'");
+				String company = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_COMPANY)).replaceAll("'", "\\'");
+				String address = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_FARM_ADDRESS)).replaceAll("'", "\\'");
+				String farmname = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_FARM_NAME)).replaceAll("'", "\\''");
+				String farmid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_FARM_ID)).replaceAll("'", "\\'");
+				String contactnumber = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_C_NUMBER)).replaceAll("'", "\\'");
+				String cultype = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_CULTYPE)).replaceAll("'", "\\'");
+				String cullvl = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_CULTlVL)).replaceAll("'", "\\'");
+				String wattype = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_WATTYPE)).replaceAll("'", "\\'");
+				String dateadded = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_dateAdded)).replaceAll("'", "\\'");
+				String addedby = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_addedby)).replaceAll("'", "\\'");
+
+				sqlString = sqlString +
+						"( '"+cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_addedby))+"-"+cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_FarmInfo_ID))+"',  " +
+						"'"+cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_LAT))+"',  " +
+						"'"+cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_LNG))+"',  " +
+						"'"+contactName+"',  " +
+						"'"+company+"',  " +
+						"'"+address+"',  " +
+						"'"+farmname+"',  " +
+						"'"+farmid+"',  " +
+						"'"+contactnumber+"',  " +
+						"'"+cultype+"',  " +
+						"'"+cullvl+"',  " +
+						"'"+wattype+"',  " +
+						"'"+dateadded+"',  " +
+						"'"+addedby+"', '' ),";
+			}
+		}
+
+		return sqlString.substring(0, sqlString.length() - 1);
+	}
+
+
+	public String getSQLStringForInsert_UNPOSTED_CustomerINFO(Activity activity) {
+		String sqlString = "" +
+				"INSERT INTO `tblmaincustomerinfo` (`mci_id`, `mci_lname`, `mci_fname`, `mci_mname`, `mci_farmid`, `mci_housenumber`, `mci_street`, `mci_subdivision`, `mci_barangay`, `mci_city`, `mci_province`, `mci_customerbirthday`, `mci_birthplace`, `mci_telephone`, `mci_cellphone`, `mci_civilstatus`, `mci_s_fname`, `mci_s_lname`, `mci_s_mname`, `mci_s_birthday`, `mci_housestatus`, `mci_latitude`, `mci_longitude`, `mci_dateadded`, `mci_addedby`, `mci_lid`)  VALUES ";
+		String query = "SELECT * FROM " + GpsSQLiteHelper.TBLMAINCUSTOMERINFO + " WHERE "
+				+ GpsSQLiteHelper.CL_MAINCUSTINFO_isposted + " = 0 AND " +
+				GpsSQLiteHelper.CL_MAINCUSTINFO_AddedBy + " = " + Helper.variables.getGlobalVar_currentUserID(activity);
+
+		String[] params = new String[]{};
+		Cursor cur = db.rawQuery(query, null);
+
+		if (cur.getCount() > 0) {
+			while (cur.moveToNext()) {
+				String  mci_lname = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_LastName)).replaceAll("'", "\\'");
+				String  mci_fname = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_LastName)).replaceAll("'", "\\'");
+				String  mci_mname = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_MiddleName)).replaceAll("'", "\\'"),
+						mci_farmid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_FarmId)).replaceAll("'", "\\'"),
+						mci_housenumber = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_HouseNumber)).replaceAll("'", "\\'"),
+						mci_street = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Street)).replaceAll("'", "\\'"),
+						mci_subdivision = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Subdivision)).replaceAll("'", "\\'"),
+						mci_barangay = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Barangay)).replaceAll("'", "\\'"),
+						mci_city = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_City)).replaceAll("'", "\\'"),
+						mci_province = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Province)).replaceAll("'", "\\'"),
+						mci_customerbirthday = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_CBirthday)).replaceAll("'", "\\'"),
+						mci_birthplace = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_CBirthPlace)).replaceAll("'", "\\'"),
+						mci_telephone = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Telephone)).replaceAll("'", "\\'"),
+						mci_cellphone = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Cellphone)).replaceAll("'", "\\'"),
+						mci_civilstatus = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_CivilStatus)).replaceAll("'", "\\'"),
+						mci_s_fname = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_S_FirstName)).replaceAll("'", "\\'"),
+						mci_s_lname = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_S_LastName)).replaceAll("'", "\\'"),
+						mci_s_mname = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_S_MiddleName)).replaceAll("'", "\\'"),
+						mci_s_birthday = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_S_BirthDay)).replaceAll("'", "\\'"),
+						mci_housestatus = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_HouseStatus)).replaceAll("'", "\\'"),
+						mci_latitude = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Latitude)).replaceAll("'", "\\'"),
+						mci_longitude =  cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Longitude)).replaceAll("'", "\\'"),
+						mci_dateadded =  cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_DateAdded)).replaceAll("'", "\\'"),
+						mci_addedby =  cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_AddedBy)).replaceAll("'", "\\'"),
+						mci_lid = "";
+
+				sqlString = sqlString +
+						"( '"+cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_AddedBy))+"-"+cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_ID))+"',  " +
+						"'"+mci_lname+"',  " +
+						"'"+mci_fname+"',  " +
+						"'"+mci_mname+"',  " +
+						"'"+mci_farmid+"',  " +
+						"'"+mci_housenumber+"',  " +
+						"'"+mci_street+"',  " +
+						"'"+mci_subdivision+"',  " +
+						"'"+mci_barangay+"',  " +
+						"'"+mci_city+"',  " +
+						"'"+mci_province+"',  " +
+						"'"+mci_customerbirthday+"',  " +
+						"'"+mci_birthplace+"',  " +
+						"'"+mci_telephone+"',  " +
+						"'"+mci_cellphone+"',  " +
+						"'"+mci_civilstatus+"',  " +
+						"'"+mci_s_fname+"',  " +
+						"'"+mci_s_lname+"',  " +
+						"'"+mci_s_mname+"',  " +
+						"'"+mci_s_birthday+"',  " +
+						"'"+mci_housestatus+"',  " +
+						"'"+mci_latitude+"',  " +
+						"'"+mci_longitude+"',  " +
+						"'"+mci_dateadded+"',  " +
+						"'"+mci_addedby+"', '' ),";
+			}
+		}
+
+		return sqlString.substring(0, sqlString.length()-1);
+	}
+
+
+
+	public int getFarmInfo_notPosted_Count(Activity activity){
 		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLFARMiNFO+" WHERE "
-				+ GpsSQLiteHelper.CL_FARMINFO_IsPosted + " = 0 "
+				+ GpsSQLiteHelper.CL_FARMINFO_IsPosted + " = 0 AND "
+				+ GpsSQLiteHelper.CL_FARMINFO_addedby + " = " + Helper.variables.getGlobalVar_currentUserID(activity)
 				;
 		String[] params = new String[] {};
 		Cursor cur = db.rawQuery(query, params);
@@ -198,16 +317,17 @@ public class GpsDB_Query {
 	}
 
 
-	public int getCustInfo_notPosted_Count(){
+	public int getCustInfo_notPosted_Count(Activity activity){
 		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLMAINCUSTOMERINFO+" WHERE "
-				+ GpsSQLiteHelper.CL_MAINCUSTINFO_isposted+ " = 0 "
+				+ GpsSQLiteHelper.CL_MAINCUSTINFO_isposted+ " = 0 AND "
+				+ GpsSQLiteHelper.CL_MAINCUSTINFO_AddedBy + " = " + Helper.variables.getGlobalVar_currentUserID(activity)
 				;
 		String[] params = new String[] {};
 		Cursor cur = db.rawQuery(query, params);
 		return cur.getCount();
 	}
 
-	public int getPond_notPosted_Count(){
+	public int getPond_notPosted_Count(Activity activity){
 		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLPOND+" WHERE "
 				+ GpsSQLiteHelper.CL_POND_isPosted+ " = 0 "
 				;
@@ -216,7 +336,7 @@ public class GpsDB_Query {
 		return cur.getCount();
 	}
 
-	public int getWeeklyPosted_notPosted_Count(){
+	public int getWeeklyPosted_notPosted_Count(Activity activity){
 		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLPOND_WeeklyUpdates+" WHERE "
 				+ GpsSQLiteHelper.CL_WEEKLY_UPDATES_isposted+ " = 0 "
 				;
@@ -488,6 +608,35 @@ public class GpsDB_Query {
 		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_S_BirthDay, spouseBirthday );
 
 		return 	db.update(GpsSQLiteHelper.TBLMAINCUSTOMERINFO, newValues, where, null);
+	}
+
+	public int updateUnPostedToPosted_FARM() {
+		String where = GpsSQLiteHelper.CL_FARMINFO_IsPosted + " = 0";
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_FARMINFO_IsPosted, 1);
+		return 	db.update(GpsSQLiteHelper.TBLFARMiNFO, newValues, where, null);
+	}
+
+	public int updateUnPostedToPosted_Cust() {
+		String where = GpsSQLiteHelper.CL_MAINCUSTINFO_isposted + " = 0";
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_MAINCUSTINFO_isposted, 1);
+		return 	db.update(GpsSQLiteHelper.TBLMAINCUSTOMERINFO, newValues, where, null);
+	}
+
+	public int updateUnPostedToPosted_POND() {
+		String where = GpsSQLiteHelper.CL_POND_isPosted + " = 0";
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_POND_isPosted, 1);
+		return 	db.update(GpsSQLiteHelper.TBLPOND, newValues, where, null);
+	}
+
+
+	public int updateUnPostedToPosted_WEEKLY() {
+		String where = GpsSQLiteHelper.CL_WEEKLY_UPDATES_isposted + " = 0";
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_WEEKLY_UPDATES_isposted, 1);
+		return 	db.update(GpsSQLiteHelper.TBLPOND_WeeklyUpdates, newValues, where, null);
 	}
 
 

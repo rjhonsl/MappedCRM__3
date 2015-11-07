@@ -222,10 +222,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         maps = map;
 
         if(Helper.variables.getGlobalVar_currentLevel(activity) == 4){
-            int farmIsPostedCount =  db.getFarmInfo_notPosted_Count(),
-                    custPostedCount = db.getCustInfo_notPosted_Count(),
-                    pondPostedCount = db.getPond_notPosted_Count(),
-                    weeklyPostedCount = db.getWeeklyPosted_notPosted_Count(),
+            int farmIsPostedCount =  db.getFarmInfo_notPosted_Count(activity),
+                    custPostedCount = db.getCustInfo_notPosted_Count(activity),
+                    pondPostedCount = db.getPond_notPosted_Count(activity),
+                    weeklyPostedCount = db.getWeeklyPosted_notPosted_Count(activity),
                     sum = farmIsPostedCount + custPostedCount + pondPostedCount + weeklyPostedCount;
             if (farmIsPostedCount > 0  || custPostedCount > 0 || pondPostedCount > 0  || weeklyPostedCount > 0 ){
                 txtViewTop.setText("You have (" + sum + ") unsynced data!");
@@ -261,7 +261,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 btnSync.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        d.hide();
+                        startSynchingDB_FARMINFO();
                     }
                 });
             }
@@ -378,6 +379,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }, 500);
     }
+
+
 
     private void initListeners(final GoogleMap map) {
 
@@ -848,7 +851,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         //get current userlvl
-        if (userlvl == 1 || userlvl == 2 || userlvl == 3){ //if user is not TSR/Technician
+        if (userlvl == 1 || userlvl == 2 || userlvl == 3 || userlvl == 0 ){ //if user is not TSR/Technician
             if (Helper.isNetworkAvailable(context)){ //if internet is availble
                 StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                         new Response.Listener<String>() {
@@ -906,7 +909,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 api.addToReqQueue(postRequest, MapsActivity.this);
             }
 
-        }else if(userlvl == 0 || userlvl == 4) {//if user is tsr/technician... then query local database
+        }else if(userlvl == 4) {//if user is tsr/technician... then query local database
             Log.d("DEBUG", "Before get Cursor from db");
             activeSelection = "farm";
             Cursor cur = db.getAll_FARMINFO_LEFTJOIN_PONDINFO_LEFTJOIN_CUSTOMERINFO(Helper.variables.getGlobalVar_currentUserID(activity) + "");
@@ -1003,7 +1006,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void showAllCustomerFarmByID(final String farmid) {
 
 
-        if (userlvl == 1 || userlvl == 2 || userlvl == 3){
+        if (userlvl == 1 || userlvl == 2 || userlvl == 3 || userlvl == 0){
             PD.setMessage("Please wait...");
             PD.show();
             StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_SELECT_FARMINFO_LF_POND_AND_MCI_BY_FARMID,
@@ -1062,7 +1065,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             MyVolleyAPI api = new MyVolleyAPI();
             api.addToReqQueue(postRequest, MapsActivity.this);
-        }else if(userlvl == 0 || userlvl == 4) {
+        }else if( userlvl == 4) {
             updateDisplay();
         }
 
@@ -1073,7 +1076,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         PD.show();
         String url = Helper.variables.URL_SELECT_CUST_LOCATION_BY_ASSIGNED_AREA;
 
-        if (userlvl == 1 || userlvl == 2 || userlvl == 3){
+        if (userlvl == 1 || userlvl == 2 || userlvl == 3 || userlvl == 0){
             StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
@@ -1110,7 +1113,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             MyVolleyAPI api = new MyVolleyAPI();
             api.addToReqQueue(postRequest, MapsActivity.this);
 
-        }else if(userlvl == 0 || userlvl == 4) {
+        }else if(userlvl == 4) {
             Cursor cur = db.getCUST_LOCATION_BY_ASSIGNED_AREA(Helper.variables.getGlobalVar_currentUserID(activity)+"");
             if(cur != null) {
                 if(cur.getCount() > 0) {
@@ -1143,6 +1146,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         custInfoObject.setCust_latitude(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_Latitude)));
                         custInfoObject.setDateAddedToDB(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_DateAdded)));
                         custInfoObject.setAddedBy(cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_AddedBy)));
+                        custInfoObject.setIsPosted_cust(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_isposted)));
 
                         custInfoObjectList.add(custInfoObject);
                     }
@@ -1499,5 +1503,89 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
     }
+
+
+
+    private void startSynchingDB_FARMINFO() {
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_SYNC_FARM,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(final String response) {
+                        if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                            db.updateUnPostedToPosted_FARM();
+                            startSynchingDB_CUSTINFO();
+                        } else {
+                            Log.d("SYNC", "FAILED FARM");
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Helper.toastShort(activity, "ERROR");
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                params.put("deviceid", Helper.getMacAddress(context));
+                params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+
+
+                params.put("sql", db.getSQLStringForInsert_UNPOSTED_FARMINFO(activity) + "");
+
+                return params;
+            }
+        };
+
+        MyVolleyAPI api = new MyVolleyAPI();
+        api.addToReqQueue(postRequest, context);
+    }
+
+
+    private void startSynchingDB_CUSTINFO() {
+        StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_SYNC_FARM,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(final String response) {
+                        if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                            Helper.toastShort(activity, "SUCCESS CUST");
+                            db.updateUnPostedToPosted_Cust();
+                        } else {
+                            Helper.toastShort(activity, "FAILED CUST");
+                            Log.d("SQL_STRING", response);
+                            txtViewTop.setVisibility(View.VISIBLE);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Helper.toastShort(activity, "ERROR");
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                params.put("deviceid", Helper.getMacAddress(context));
+                params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+
+
+                params.put("sql", db.getSQLStringForInsert_UNPOSTED_CustomerINFO(activity) + "");
+
+                return params;
+            }
+        };
+
+        MyVolleyAPI api = new MyVolleyAPI();
+        api.addToReqQueue(postRequest, context);
+    }
+
 
 }

@@ -65,6 +65,10 @@ public class CustInfoObject {
 	private int isVisited;
 	private int isactive;
 	private int isPosted;
+	private int isPosted_farm;
+	private int isPosted_pond;
+	private int isPosted_cust;
+	private int isPosted_weekly;
 
 	private String customerID;
 	private String mainCustomerId;
@@ -83,6 +87,10 @@ public class CustInfoObject {
 	private String subdivision;
 	private String houseStatus;
 	private String addedBy;
+	private String addedBy_farm;
+	private String addedBy_cust;
+	private String addedBy_pond;
+	private String addedBy_weekly;
 
 
 
@@ -724,5 +732,69 @@ public class CustInfoObject {
 
 	public void setCustfarmID(String custfarmID) {
 		CustfarmID = custfarmID;
+	}
+
+	public int getIsPosted_weekly() {
+		return isPosted_weekly;
+	}
+
+	public void setIsPosted_weekly(int isPosted_weekly) {
+		this.isPosted_weekly = isPosted_weekly;
+	}
+
+	public int getIsPosted_cust() {
+		return isPosted_cust;
+	}
+
+	public void setIsPosted_cust(int isPosted_cust) {
+		this.isPosted_cust = isPosted_cust;
+	}
+
+	public int getIsPosted_pond() {
+		return isPosted_pond;
+	}
+
+	public void setIsPosted_pond(int isPosted_pond) {
+		this.isPosted_pond = isPosted_pond;
+	}
+
+	public int getIsPosted_farm() {
+		return isPosted_farm;
+	}
+
+	public void setIsPosted_farm(int isPosted_farm) {
+		this.isPosted_farm = isPosted_farm;
+	}
+
+	public String getAddedBy_weekly() {
+		return addedBy_weekly;
+	}
+
+	public void setAddedBy_weekly(String addedBy_weekly) {
+		this.addedBy_weekly = addedBy_weekly;
+	}
+
+	public String getAddedBy_pond() {
+		return addedBy_pond;
+	}
+
+	public void setAddedBy_pond(String addedBy_pond) {
+		this.addedBy_pond = addedBy_pond;
+	}
+
+	public String getAddedBy_cust() {
+		return addedBy_cust;
+	}
+
+	public void setAddedBy_cust(String addedBy_cust) {
+		this.addedBy_cust = addedBy_cust;
+	}
+
+	public String getAddedBy_farm() {
+		return addedBy_farm;
+	}
+
+	public void setAddedBy_farm(String addedBy_farm) {
+		this.addedBy_farm = addedBy_farm;
 	}
 }
