@@ -10,7 +10,7 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 	private static final String LOGTAG = "DB_GPS";
 	private static final String DATABASE_NAME = "local.db";
 	//each time you change data structure, you must increment this by 1
-	private static final int DATABASE_VERSION = 11;
+	private static final int DATABASE_VERSION = 15;
 
 	//Reference for tblmaincustomerinfo
 	public static final String TBLMAINCUSTOMERINFO 				= "tblmaincustomerinfo";
@@ -156,8 +156,9 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 	public static final String CL_USER_ACTIVITY_LNG			= "user_act_longitude";
 	public static final String CL_USER_ACTIVITY_DATETIME	= "user_act_datetime";
 	public static final String CL_USER_ACTIVITY_ACTIONTYPE	= "user_act_actiontype";
+	public static final String CL_USER_ACTIVITY_isPosted	= "user_act_isposted";
 	public static final String[] ALL_KEY_USERACTIVITY		= new String[]{CL_USER_ACTIVITY_ID, CL_USER_ACTIVITY_USERID, CL_USER_ACTIVITY_ACTIONDONE,
-			CL_USER_ACTIVITY_LAT, CL_USER_ACTIVITY_LNG, CL_USER_ACTIVITY_DATETIME, CL_USER_ACTIVITY_ACTIONTYPE};
+			CL_USER_ACTIVITY_LAT, CL_USER_ACTIVITY_LNG, CL_USER_ACTIVITY_DATETIME, CL_USER_ACTIVITY_ACTIONTYPE, CL_USER_ACTIVITY_isPosted};
 
 
 	//////////////////////////////////////////////////////////////////
@@ -297,7 +298,8 @@ public class GpsSQLiteHelper extends SQLiteOpenHelper {
 					CL_USER_ACTIVITY_LAT 			+ " TEXT, " +
 					CL_USER_ACTIVITY_LNG 			+ " TEXT, " +
 					CL_USER_ACTIVITY_DATETIME 		+ " DATETIME, " +
-					CL_USER_ACTIVITY_ACTIONTYPE 	+ " TEXT" +
+					CL_USER_ACTIVITY_ACTIONTYPE 	+ " TEXT," +
+					CL_USER_ACTIVITY_isPosted 		+ " INTEGER" +
 					")";
 
 

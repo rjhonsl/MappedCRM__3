@@ -187,7 +187,7 @@ public class Activity_ManagePonds extends AppCompatActivity {
 
                         }else if (position == 2) {
                             if (pondInfoList.get(position1).getIsPosted() == 0) {
-                                if (Helper.variables.getGlobalVar_currentLevel(activity)==4){
+                                if (Helper.variables.getGlobalVar_currentLevel(activity) == 4) {
                                     final Dialog dd = Helper.createCustomDialogThemedYesNO(activity, "Changes cannot be undone once implemented. \n\nAre you sure you want to delete this pond?"
                                             , "Delete", "NO", "YES", R.color.red);
                                     dd.show();
@@ -208,11 +208,11 @@ public class Activity_ManagePonds extends AppCompatActivity {
                                             dd.hide();
                                         }
                                     });
-                                }else {
+                                } else {
                                     Helper.createCustomThemedDialogOKOnly(activity, "Oops", "You have no permission delete this record", "OK", R.color.red);
                                 }
 
-                            }else {
+                            } else {
                                 Helper.createCustomThemedDialogOKOnly(activity, "Oops", "Record is already finalized/posted on server. Contact admin for further changes", "OK", R.color.red);
                             }
 

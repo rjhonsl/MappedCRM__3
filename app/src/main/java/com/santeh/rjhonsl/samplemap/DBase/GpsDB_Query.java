@@ -64,6 +64,7 @@ public class GpsDB_Query {
 		values.put(GpsSQLiteHelper.CL_USER_ACTIVITY_LNG, lng);
 		values.put(GpsSQLiteHelper.CL_USER_ACTIVITY_DATETIME, dateTime);
 		values.put(GpsSQLiteHelper.CL_USER_ACTIVITY_ACTIONTYPE, actionType);
+		values.put(GpsSQLiteHelper.CL_USER_ACTIVITY_isPosted, "0");
 
 		return  db.insert(GpsSQLiteHelper.TBLUSER_ACTIVITY, null, values);
 	}
@@ -226,7 +227,8 @@ public class GpsDB_Query {
 						"'"+cullvl+"',  " +
 						"'"+wattype+"',  " +
 						"'"+dateadded+"',  " +
-						"'"+addedby+"', '' ),";
+						"'"+addedby+"', " +
+						"'"+cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_FarmInfo_ID))+"' ),";
 			}
 		}
 
@@ -297,12 +299,143 @@ public class GpsDB_Query {
 						"'"+mci_latitude+"',  " +
 						"'"+mci_longitude+"',  " +
 						"'"+mci_dateadded+"',  " +
-						"'"+mci_addedby+"', '' ),";
+						"'"+mci_addedby+"', " +
+						"'"+cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_MAINCUSTINFO_ID))+"' ),";
 			}
 		}
 
 		return sqlString.substring(0, sqlString.length()-1);
 	}
+
+
+
+	public String getUserIdOfPond(String pondid) {
+		String addedby = "";
+		String query =
+				"SELECT tblCustomerInfo.addedby FROm tblPond\n" +
+				"\n" +
+				"INNER JOIN tblCustomerInfo ON tblCustomerInfo.ci_customerid = tblPond.customerId\n" +
+				"\n" +
+				"WHERE tblPond.id = ?;";
+
+		String[] params = new String[] {pondid};
+		Cursor cur = db.rawQuery(query, params);
+		if (cur.getCount()> 0){
+			while (cur.moveToNext()) {
+				addedby = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_FARMINFO_addedby));
+			}
+		}else {
+			addedby = "0";
+		}
+		return addedby;
+	}
+
+	public String getSQLStringForInsert_UNPOSTED_POND(Activity activity) {
+		String sqlString = "" +
+				"INSERT INTO `tblPond` (`id`, `pondid`, `specie`, `sizeofStock`, `survivalrate`, `dateStocked`, `quantity`, `area`, `culturesystem`, `remarks`, `customerId`, `p_lid`) VALUES  ";
+		String query = "SELECT * FROM " + GpsSQLiteHelper.TBLPOND + " WHERE "
+				+ GpsSQLiteHelper.CL_POND_isPosted + " = 0 ";
+		String[] params = new String[]{};
+		Cursor cur = db.rawQuery(query, null);
+
+		if (cur.getCount() > 0) {
+			while (cur.moveToNext()) {
+				String tempid = getUserIdOfPond( cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_INDEX))+"") + "-" + cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_INDEX));
+				String id = tempid.replaceAll("'", "\\'");
+				String pondid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_PID)).replaceAll("'", "\\'");
+				String specie = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_specie)).replaceAll("'", "\\'");
+				String sizeofStock = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_sizeofStock)).replaceAll("'", "\\'");
+				String survivalrate = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_survivalrate)).replaceAll("'", "\\'");
+				String dateStocked = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_dateStocked)).replaceAll("'", "\\'");
+				String quantity = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_quantity)).replaceAll("'", "\\'");
+				String area = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_area)).replaceAll("'", "\\'");
+				String culturesystem = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_culturesystem)).replaceAll("'", "\\'");
+				String remarks = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_remarks)).replaceAll("'", "\\'");
+				String customerId = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_customerId)).replaceAll("'", "\\'");
+				String plid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_INDEX)).replaceAll("'", "\\'");
+
+				sqlString = sqlString +
+						"( '" + id + "',  " +
+						"'"+pondid+"', " +
+						"'"+specie+"', " +
+						"'"+sizeofStock+"', " +
+						"'"+survivalrate+"', " +
+						"'"+dateStocked+"', " +
+						"'"+quantity+"', " +
+						"'"+area+"', " +
+						"'"+culturesystem+"', " +
+						"'"+remarks+"', " +
+						"'"+customerId+"', " +
+						"'" +plid+ "' ),";
+			}
+		}
+
+		return sqlString.substring(0, sqlString.length() - 1);
+	}
+
+
+	public String getSQLStringForInsert_UNPOSTED_WEEKLY() {
+		String sqlString = "" +
+				"INSERT INTO `tblpond_weeklyupdates` (`wu_id`, `wu_currentabw`, `wu_remakrs`, `wu_pondid`, `wu_dateAdded`, `wu_lid`) VALUES ";
+		String query = "SELECT * FROM " + GpsSQLiteHelper.TBLPOND_WeeklyUpdates + " WHERE "
+				+ GpsSQLiteHelper.CL_WEEKLY_UPDATES_isposted+ " = 0 ";
+		String[] params = new String[]{};
+		Cursor cur = db.rawQuery(query, null);
+
+		if (cur.getCount() > 0) {
+			while (cur.moveToNext()) {
+				String tempid = getUserIdOfPond(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_PONDID))+"") + "-" + cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_ID));
+				String wu_id = tempid.replaceAll("'", "\\'");
+				String wu_currentabw = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_CURRENT_ABW)).replaceAll("'", "\\'");
+				String wu_remakrs = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_REMARKS)).replaceAll("'", "\\'");
+				String wu_pondid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_PONDID)).replaceAll("'", "\\'");
+				String wu_dateAdded = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_DATEADDED)).replaceAll("'", "\\'");
+				String wu_lid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_ID)).replaceAll("'", "\\'");
+				sqlString = sqlString +
+						"( '" + wu_id + "',  " +
+						"'"+wu_currentabw+"', " +
+						"'"+wu_remakrs+"', " +
+						"'"+wu_pondid+"', " +
+						"'"+wu_dateAdded+"', " +
+						"'" +wu_lid+ "' ),";
+			}
+		}
+		return sqlString.substring(0, sqlString.length() - 1);
+	}
+
+
+
+	public String getSQLStringForInsert_UNPOSTED_USERACTIVITY() {
+		String sqlString = "" +
+				"INSERT INTO `tbluser_activity` (`user_act_id`, `user_act_userid`, `user_act_actiondone`, `user_act_latitude`, `user_act_longitude`, `user_act_datetime`, `user_act_actiontype`) VALUES ";
+		String query = "SELECT * FROM " + GpsSQLiteHelper.TBLUSER_ACTIVITY + " WHERE "
+				+ GpsSQLiteHelper.CL_USER_ACTIVITY_isPosted+ " = 0 ";
+
+		String[] params = new String[]{};
+		Cursor cur = db.rawQuery(query, null);
+
+		if (cur.getCount() > 0) {
+			while (cur.moveToNext()) {
+				String user_act_id = "";
+				String user_act_userid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_USER_ACTIVITY_USERID))+"";
+				String user_act_actiondone = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_USER_ACTIVITY_ACTIONDONE))+"";
+				String user_act_latitude = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_USER_ACTIVITY_LAT))+"";
+				String user_act_longitude = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_USER_ACTIVITY_LNG))+"";
+				String user_act_datetime = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_USER_ACTIVITY_DATETIME))+"";
+				String user_act_actiontype = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_USER_ACTIVITY_ACTIONTYPE))+"";
+				sqlString = sqlString +
+						"( '',  " +
+						"'"+user_act_userid+"', " +
+						"'"+user_act_actiondone+"', " +
+						"'"+user_act_latitude+"', " +
+						"'"+user_act_longitude+"', " +
+						"'"+user_act_datetime+"', " +
+						"'" +user_act_actiontype+ "' ),";
+			}
+		}
+		return sqlString.substring(0, sqlString.length() - 1);
+	}
+
 
 
 
@@ -339,6 +472,15 @@ public class GpsDB_Query {
 	public int getWeeklyPosted_notPosted_Count(Activity activity){
 		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLPOND_WeeklyUpdates+" WHERE "
 				+ GpsSQLiteHelper.CL_WEEKLY_UPDATES_isposted+ " = 0 "
+				;
+		String[] params = new String[] {};
+		Cursor cur = db.rawQuery(query, params);
+		return cur.getCount();
+	}
+
+	public int getUserActivity_notPosted_Count(Activity activity){
+		String query = "SELECT * FROM "+GpsSQLiteHelper.TBLUSER_ACTIVITY+" WHERE "
+				+ GpsSQLiteHelper.CL_USER_ACTIVITY_isPosted+ " = 0 "
 				;
 		String[] params = new String[] {};
 		Cursor cur = db.rawQuery(query, params);
@@ -639,9 +781,16 @@ public class GpsDB_Query {
 		return 	db.update(GpsSQLiteHelper.TBLPOND_WeeklyUpdates, newValues, where, null);
 	}
 
+	public int updateUnPostedToPosted_USERACTIVITY() {
+		String where = GpsSQLiteHelper.CL_USER_ACTIVITY_isPosted+ " = 0";
+		ContentValues newValues = new ContentValues();
+		newValues.put(GpsSQLiteHelper.CL_USER_ACTIVITY_isPosted, 1);
+		return 	db.update(GpsSQLiteHelper.TBLUSER_ACTIVITY, newValues, where, null);
+	}
+
 
 	/********************************************
-	 * 				DELETEs						*
+	 * 				DELETES						*
 	 ********************************************/
 
 	//Deletes row from Contacts

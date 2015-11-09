@@ -1507,84 +1507,231 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private void startSynchingDB_FARMINFO() {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_SYNC_FARM,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(final String response) {
-                        if (!response.substring(1, 2).equalsIgnoreCase("0")) {
-                            db.updateUnPostedToPosted_FARM();
-                            startSynchingDB_CUSTINFO();
-                        } else {
-                            Log.d("SYNC", "FAILED FARM");
+        if (db.getFarmInfo_notPosted_Count(activity) > 0) {
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_PHP_RAW_QUERY_POST,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(final String response) {
+                            if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                                db.updateUnPostedToPosted_FARM();
+                                startSynchingDB_CUSTINFO();
+                            } else {
+                                Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
+                            }
                         }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Helper.toastShort(activity, "ERROR");
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
-                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
-                params.put("deviceid", Helper.getMacAddress(context));
-                params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
-                params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Helper.toastShort(activity, "ERROR");
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                    params.put("deviceid", Helper.getMacAddress(context));
+                    params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                    params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
 
 
-                params.put("sql", db.getSQLStringForInsert_UNPOSTED_FARMINFO(activity) + "");
+                    params.put("sql", db.getSQLStringForInsert_UNPOSTED_FARMINFO(activity) + "");
 
-                return params;
-            }
-        };
+                    return params;
+                }
+            };
 
-        MyVolleyAPI api = new MyVolleyAPI();
-        api.addToReqQueue(postRequest, context);
+            MyVolleyAPI api = new MyVolleyAPI();
+            api.addToReqQueue(postRequest, context);
+        }else{
+            startSynchingDB_CUSTINFO();
+        }
+
     }
 
 
     private void startSynchingDB_CUSTINFO() {
-        StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_SYNC_FARM,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(final String response) {
-                        if (!response.substring(1, 2).equalsIgnoreCase("0")) {
-                            Helper.toastShort(activity, "SUCCESS CUST");
-                            db.updateUnPostedToPosted_Cust();
-                        } else {
-                            Helper.toastShort(activity, "FAILED CUST");
-                            Log.d("SQL_STRING", response);
-                            txtViewTop.setVisibility(View.VISIBLE);
+
+        if (db.getCustInfo_notPosted_Count(activity) > 0) {
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_PHP_RAW_QUERY_POST,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(final String response) {
+                            if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                                startSynchingDB_PondInfo();
+                                db.updateUnPostedToPosted_Cust();
+                            } else {
+                                Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
+                            }
                         }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Helper.toastShort(activity, "ERROR");
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
-                params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
-                params.put("deviceid", Helper.getMacAddress(context));
-                params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
-                params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                    params.put("deviceid", Helper.getMacAddress(context));
+                    params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                    params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+
+                    params.put("sql", db.getSQLStringForInsert_UNPOSTED_CustomerINFO(activity) + "");
+
+                    return params;
+                }
+            };
+
+            MyVolleyAPI api = new MyVolleyAPI();
+            api.addToReqQueue(postRequest, context);
+        }else {
+            startSynchingDB_PondInfo();
+        }
+
+    }
+
+    private void startSynchingDB_PondInfo() {
+
+        if (db.getPond_notPosted_Count(activity) > 0) {
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_PHP_RAW_QUERY_POST,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(final String response) {
+                            if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                                db.updateUnPostedToPosted_POND();
+                                startSynchingDB_weeklyPondReport();
+                            } else {
+                                Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                    params.put("deviceid", Helper.getMacAddress(context));
+                    params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                    params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+                    params.put("sql", db.getSQLStringForInsert_UNPOSTED_POND(activity) + "");
+
+                    Log.d("SQL_STRING", db.getSQLStringForInsert_UNPOSTED_POND(activity));
+
+                    return params;
+                }
+            };
+
+            MyVolleyAPI api = new MyVolleyAPI();
+            api.addToReqQueue(postRequest, context);
+        }else{
+            startSynchingDB_weeklyPondReport();
+        }
+    }
 
 
-                params.put("sql", db.getSQLStringForInsert_UNPOSTED_CustomerINFO(activity) + "");
+    private void startSynchingDB_weeklyPondReport() {
 
-                return params;
-            }
-        };
+        if (db.getWeeklyPosted_notPosted_Count(activity) > 0) {
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_PHP_RAW_QUERY_POST,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(final String response) {
+                            if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                                db.updateUnPostedToPosted_WEEKLY();
+                                txtViewTop.setVisibility(View.GONE);
+                                txtViewTop.clearAnimation();
+                                startSynchingDB_UserActivity();
+                                Helper.toastShort(activity, "SYNC FINISHED.");
+                            } else {
+                                Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                    params.put("deviceid", Helper.getMacAddress(context));
+                    params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                    params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+                    params.put("sql", db.getSQLStringForInsert_UNPOSTED_WEEKLY() + "");
 
-        MyVolleyAPI api = new MyVolleyAPI();
-        api.addToReqQueue(postRequest, context);
+                    Log.d("SQL_STRING", db.getSQLStringForInsert_UNPOSTED_WEEKLY());
+
+                    return params;
+                }
+            };
+
+            MyVolleyAPI api = new MyVolleyAPI();
+            api.addToReqQueue(postRequest, context);
+        }else{
+            Helper.toastShort(activity, "SYNC FINISHED.");
+            txtViewTop.setVisibility(View.GONE);
+            txtViewTop.clearAnimation();
+            startSynchingDB_UserActivity();
+        }
+    }
+
+
+    private void startSynchingDB_UserActivity() {
+
+        if (db.getUserActivity_notPosted_Count(activity) > 0) {
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_PHP_RAW_QUERY_POST,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(final String response) {
+                            if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                                db.updateUnPostedToPosted_WEEKLY();
+                                Helper.toastShort(activity, "SYNC FINISHED USERS.");
+                            } else {
+                                Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again. USERS");
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again. USERS");
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                    params.put("deviceid", Helper.getMacAddress(context));
+                    params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                    params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+                    params.put("sql", db.getSQLStringForInsert_UNPOSTED_USERACTIVITY() + "");
+
+                    Log.d("SQL_STRING", db.getSQLStringForInsert_UNPOSTED_USERACTIVITY());
+                    return params;
+                }
+            };
+
+            MyVolleyAPI api = new MyVolleyAPI();
+            api.addToReqQueue(postRequest, context);
+        }else{
+            Helper.toastShort(activity, "SYNC FINISHED. USERS ");
+        }
     }
 
 
