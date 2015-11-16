@@ -219,6 +219,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.getUiSettings().setMapToolbarEnabled(false);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.setMyLocationEnabled(true);
+        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         maps = map;
 
         if(Helper.variables.getGlobalVar_currentLevel(activity) == 4){
@@ -361,16 +362,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void run() {
             try{
+                //centered on sibuyan sea
+
                     if (checkIfLocationAvailable()){
-                        moveCameraAnimate(map, fusedLocation.getLastKnowLocation(), zoom);
+                        moveCameraAnimate(map, new LatLng(11.867145, 122.756693), 6);
                         insertloginlocation();
                         initMarkers();
                     }
                     else{
                         PD.hide();
-                        curlat = 14.651391;
-                        curLong = 121.029335;
-                        zoom = 9;
+                        curlat = 11.867145;
+                        curLong = 122.756693;
+                        zoom = 5;
                     }
                 }catch(Exception e){
                     Helper.toastShort(activity, "Location is not available: "+e);
@@ -668,8 +671,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if (position == 0) {
-
-
                                 final Intent intent = new Intent(MapsActivity.this, Activity_CustomerDetails.class);
                                 intent.putExtra("id", details[2]);
                                 final Handler handler = new Handler();
@@ -1205,12 +1206,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(final String response) {
-
                             PD.dismiss();
-
                             if (!response.substring(1, 2).equalsIgnoreCase("0")) {
                                 custInfoObjectList = CustAndPondParser.parseFeed(response);
-
                                 showAllCustomerFarmByFarmID();
                             } else {Helper.createCustomThemedDialogOKOnly(activity, "Warning", "No farm related to selected customer. Please check Farm ID", "OK", R.color.red);}
                         }
@@ -1240,9 +1238,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             api.addToReqQueue(postRequest, MapsActivity.this);
         }else if(userlvl == 0 || userlvl == 4) {
             Cursor cur = db.getFARM_POND_CUSTOMER_BY_FARMID(Helper.variables.getGlobalVar_currentUserID(activity)+"", farmid);
-            getFarmPondCustFromDB(cur);
-            Log.d("SHOW MARKER", "showAllCustomerFarmByFarmID");
-            showAllCustomerFarmByFarmID();
+            activeSelection = "customer";
+            if (cur.getCount() > 0){
+                getFarmPondCustFromDB(cur);
+                Log.d("SHOW MARKER", "showAllCustomerFarmByFarmID");
+                showAllCustomerFarmByFarmID();
+            }else{
+                PD.dismiss();
+                prompt_noFarm();
+            }
 
         }
 
@@ -1251,7 +1255,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void showAllCustomerFarmByFarmID() {
         if (custInfoObjectList!=null){
             if (custInfoObjectList.size() > 0) {
-
                 Log.d("DEBUG", "Show all custinfo by farmID - active selection customer");
                 activeSelection = "customer";
                 String farmnames[] = new String[custInfoObjectList.size()];
@@ -1651,7 +1654,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 db.updateUnPostedToPosted_WEEKLY();
                                 txtViewTop.setVisibility(View.GONE);
                                 txtViewTop.clearAnimation();
-                                startSynchingDB_UserActivity();
                                 Helper.toastShort(activity, "SYNC FINISHED.");
                             } else {
                                 Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again.");
@@ -1686,53 +1688,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Helper.toastShort(activity, "SYNC FINISHED.");
             txtViewTop.setVisibility(View.GONE);
             txtViewTop.clearAnimation();
-            startSynchingDB_UserActivity();
         }
     }
-
-
-    private void startSynchingDB_UserActivity() {
-
-        if (db.getUserActivity_notPosted_Count(activity) > 0) {
-            StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_PHP_RAW_QUERY_POST,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(final String response) {
-                            if (!response.substring(1, 2).equalsIgnoreCase("0")) {
-                                db.updateUnPostedToPosted_WEEKLY();
-                                Helper.toastShort(activity, "SYNC FINISHED USERS.");
-                            } else {
-                                Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again. USERS");
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again. USERS");
-                        }
-                    }) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
-                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
-                    params.put("deviceid", Helper.getMacAddress(context));
-                    params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
-                    params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
-                    params.put("sql", db.getSQLStringForInsert_UNPOSTED_USERACTIVITY() + "");
-
-                    Log.d("SQL_STRING", db.getSQLStringForInsert_UNPOSTED_USERACTIVITY());
-                    return params;
-                }
-            };
-
-            MyVolleyAPI api = new MyVolleyAPI();
-            api.addToReqQueue(postRequest, context);
-        }else{
-            Helper.toastShort(activity, "SYNC FINISHED. USERS ");
-        }
-    }
-
-
 }

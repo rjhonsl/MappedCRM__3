@@ -351,7 +351,7 @@ public class GpsDB_Query {
 				String area = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_area)).replaceAll("'", "\\'");
 				String culturesystem = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_culturesystem)).replaceAll("'", "\\'");
 				String remarks = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_remarks)).replaceAll("'", "\\'");
-				String customerId = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_customerId)).replaceAll("'", "\\'");
+				String customerId = getUserIdOfPond( cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_INDEX))+"") + "-" + cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_customerId)).replaceAll("'", "\\'");
 				String plid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_POND_INDEX)).replaceAll("'", "\\'");
 
 				sqlString = sqlString +
@@ -388,7 +388,7 @@ public class GpsDB_Query {
 				String wu_id = tempid.replaceAll("'", "\\'");
 				String wu_currentabw = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_CURRENT_ABW)).replaceAll("'", "\\'");
 				String wu_remakrs = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_REMARKS)).replaceAll("'", "\\'");
-				String wu_pondid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_PONDID)).replaceAll("'", "\\'");
+				String wu_pondid =  getUserIdOfPond(cur.getInt(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_PONDID))+"") + "-" +cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_PONDID)).replaceAll("'", "\\'");
 				String wu_dateAdded = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_DATEADDED)).replaceAll("'", "\\'");
 				String wu_lid = cur.getString(cur.getColumnIndex(GpsSQLiteHelper.CL_WEEKLY_UPDATES_ID)).replaceAll("'", "\\'");
 				sqlString = sqlString +

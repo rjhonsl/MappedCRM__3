@@ -311,7 +311,7 @@
                             android:id="@+id/txt_markerdetails_farmID"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="textCapWords"
+                            android:inputType="textCapCharacters"
                             />
                     </LinearLayout>
                 </LinearLayout>

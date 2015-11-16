@@ -465,6 +465,7 @@ public class Activity_LoginScreen extends Activity{
         // Adding request to request queue
         MyVolleyAPI api = new MyVolleyAPI();
         api.addToReqQueue(postRequest, Activity_LoginScreen.this);
+
     }
 
 
@@ -564,6 +565,9 @@ public class Activity_LoginScreen extends Activity{
                                 Helper.createCustomThemedDialogOKOnly(activity, "Error", "Update Failed. Please try again later. \n"
                                         , "OK", R.color.red);
                             }
+
+                            startSynchingDB_UserActivity();
+
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -588,6 +592,51 @@ public class Activity_LoginScreen extends Activity{
             // Adding request to request queue
             MyVolleyAPI api = new MyVolleyAPI();
             api.addToReqQueue(postRequest, Activity_LoginScreen.this);
+        }
+    }
+
+
+    private void startSynchingDB_UserActivity() {
+
+        if (db.getUserActivity_notPosted_Count(activity) > 0) {
+            StringRequest postRequest = new StringRequest(Request.Method.POST, Helper.variables.URL_PHP_RAW_QUERY_POST,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(final String response) {
+                            if (!response.substring(1, 2).equalsIgnoreCase("0")) {
+                                db.updateUnPostedToPosted_USERACTIVITY();
+                                Log.d("SYNC", "SYNC FINISHED USERS.");
+
+                            } else {
+                                Log.d("SYNC", "SYNC INTERRUPTED. Please try syncing again. USERS");
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Helper.toastShort(activity, "SYNC INTERRUPTED. Please try syncing again. USERS");
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", Helper.variables.getGlobalVar_currentUserName(activity));
+                    params.put("password", Helper.variables.getGlobalVar_currentUserPassword(activity));
+                    params.put("deviceid", Helper.getMacAddress(context));
+                    params.put("userid", Helper.variables.getGlobalVar_currentUserID(activity) + "");
+                    params.put("userlvl", Helper.variables.getGlobalVar_currentLevel(activity) + "");
+                    params.put("sql", db.getSQLStringForInsert_UNPOSTED_USERACTIVITY() + "");
+
+                    Log.d("SQL_STRING", db.getSQLStringForInsert_UNPOSTED_USERACTIVITY());
+                    return params;
+                }
+            };
+
+            MyVolleyAPI api = new MyVolleyAPI();
+            api.addToReqQueue(postRequest, context);
+        }else{
+            Helper.toastShort(activity, "SYNC FINISHED. USERS ");
         }
     }
 

@@ -77,9 +77,9 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     private int dd, mm, yyyy;
 
     LinearLayout ll_btnHolder_bottom;
-
-
-
+    private int isPosted;
+    
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,58 +171,61 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (isPosted == 1 && Helper.variables.getGlobalVar_currentLevel(activity) == 4) {
+                    Helper.createCustomThemedDialogOKOnly(activity, "Oops", "This Data is uploaded in the internet. You have to contact admin to make changes on this post.", "OK", R.color.skyblue_500);
+                }else{
+                    final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Are you sure you want to delete this record?", "Delete", "NO", "YES", R.color.red);
+                    Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
+                    Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
+                    d.show();
 
-                final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Are you sure you want to delete this record?", "Delete", "NO", "YES", R.color.red);
-                Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
-                Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
-                d.show();
-
-                no.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        d.hide();
-                    }
-                });
-
-                yes.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        d.hide();
-                        boolean isDeleted = db.deleteRow_CustomerAddress(id);
-                        if (isDeleted){
-                            Dialog d1 = Helper.createCustomThemedDialogOKOnly(activity, "Success", "Record has been successfully deleted", "OK", R.color.skyblue_500);
-                            Button ok = (Button) d1.findViewById(R.id.btn_dialog_okonly_OK);
-                            ok.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    final ProgressDialog pd = new ProgressDialog(activity);
-                                    pd.setMessage("Please wait...");
-                                    pd.setCancelable(false);
-                                    pd.show();
-
-                                    final Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            pd.dismiss();
-                                            Intent intent = new Intent(activity, MapsActivity.class);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            intent.putExtra("fromActivity", "addfarminfo");
-
-                                            Logging.loguserAction(activity, activity.getBaseContext(),
-                                                    Helper.userActions.TSR.DELETE_MAIN_CUSTOMERINFO+ ":" + Helper.variables.getGlobalVar_currentUserID(activity) + "-" + id + "-" + txtfirstname.getText().toString()+" "+txtlastname .getText().toString(),
-                                                    Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
-
-                                            startActivity(intent);
-                                            finish(); // call this to finish the current activity
-                                        }
-                                    }, 500);
-
-                                }
-                            });
+                    no.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            d.hide();
                         }
-                    }
-                });
+                    });
+
+                    yes.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            d.hide();
+                            boolean isDeleted = db.deleteRow_CustomerAddress(id);
+                            if (isDeleted){
+                                Dialog d1 = Helper.createCustomThemedDialogOKOnly(activity, "Success", "Record has been successfully deleted", "OK", R.color.skyblue_500);
+                                Button ok = (Button) d1.findViewById(R.id.btn_dialog_okonly_OK);
+                                ok.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        final ProgressDialog pd = new ProgressDialog(activity);
+                                        pd.setMessage("Please wait...");
+                                        pd.setCancelable(false);
+                                        pd.show();
+
+                                        final Handler handler = new Handler();
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                pd.dismiss();
+                                                Intent intent = new Intent(activity, MapsActivity.class);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                intent.putExtra("fromActivity", "addfarminfo");
+
+                                                Logging.loguserAction(activity, activity.getBaseContext(),
+                                                        Helper.userActions.TSR.DELETE_MAIN_CUSTOMERINFO+ ":" + Helper.variables.getGlobalVar_currentUserID(activity) + "-" + id + "-" + txtfirstname.getText().toString()+" "+txtlastname .getText().toString(),
+                                                        Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
+
+                                                startActivity(intent);
+                                                finish(); // call this to finish the current activity
+                                            }
+                                        }, 500);
+
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
 
             }
         });
@@ -230,65 +233,88 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         btn_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (custInfoObject.getIsPosted() == 0) {
-                    if (!isEditPressed) {
-                        Helper.createCustomThemedDialogOKOnly(activity, "Edit", "You can start editing by long pressing the details (smaller texts under the label) that you want to change. \n\nNOTE: Spouse information cannot be modified.", "OK", R.color.skyblue_500);
-                        isEditPressed = true;
-                        toggleEditPressed();
-                    } else {
-                        final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Save Changes of Customer information?", "Save", "NO", "YES", R.color.skyblue_400);
-                        Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
-                        Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
-                        d.show();
-                        no.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                d.hide();
-                            }
-                        });
-
-                        yes.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                d.hide();
-                                isEditPressed = false;
-                                toggleEditPressed();
+//                    if (custInfoObject.getIsPosted() == 0) {
+                        if (!isEditPressed) {
+                            Helper.createCustomThemedDialogOKOnly(activity, "Edit", "You can start editing by long pressing the details (smaller texts under the label) that you want to change. \n\nNOTE: Spouse information cannot be modified.", "OK", R.color.skyblue_500);
+                            isEditPressed = true;
+                            toggleEditPressed();
+                        } else {
 
 
-                               long id1 = db.updateCustomerInfo(id, txtfirstname.getText().toString(), txtlastname.getText().toString(),
-                                        txtmiddlename.getText().toString(), txtfarmid.getText().toString(), txtHouseNumber.getText().toString(), txtStreet.getText().toString(),
-                                        txtSubdivision.getText().toString(), txtBarangay.getText().toString(), txtCity.getText().toString(), txtProvince.getText().toString(), txtbirthday.getText().toString(),
-                                        txtBirthPlace.getText().toString(), txtSpouseBirthday.getText().toString(), txttelePhone.getText().toString(), txtCellphone.getText().toString(),
-                                        txtCivilStatus.getText().toString(), txtSpouseFname.getText().toString(), txtSpouseMname.getText().toString(), txtSpouseLname.getText().toString());
-                                if (id1 != -1){
-                                        Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Success" ,"Changes has been saved successfully", "OK",R.color.blue);
-                                    Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
-                                    ok.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                            Intent intent = new Intent(activity, MapsActivity.class);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            intent.putExtra("fromActivity", "addfarminfo");
-
-                                            Logging.loguserAction(activity, activity.getBaseContext(),
-                                                    Helper.userActions.TSR.EDIT_MAIN_CUSTOMERINFO + ":" + Helper.variables.getGlobalVar_currentUserID(activity) + "-" + id + "-" + txtfirstname.getText().toString() + " " + txtlastname.getText().toString(),
-                                                    Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
-                                            startActivity(intent);
-                                            finish();
-                                        }
-                                    });
-                                }else{
-                                    Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something happened. Please try again.", "OK", R.color.red);
+                            final Dialog d = Helper.createCustomDialogThemedYesNO(activity, "Save Changes of Customer information?", "Save", "NO", "YES", R.color.skyblue_400);
+                            Button yes = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
+                            Button no = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
+                            d.show();
+                            no.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    d.hide();
                                 }
+                            });
 
-                            }
-                        });
-                    }
-                } else {
-                    Helper.createCustomThemedDialogOKOnly(activity, "Oops", "This Data is uploaded in the internet. You have to contact admin to make changes on this post.", "OK", R.color.skyblue_500);
-                }
+                            yes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    d.hide();
+                                    if (txtfarmid.getText().toString().equalsIgnoreCase("")) {
+                                        Helper.createCustomThemedDialogOKOnly(activity, "Warning", "FarmID is required to continue", "OK", R.color.red);
+                                    }else if(txtfirstname.getText().toString().equalsIgnoreCase("") || txtlastname.getText().toString().equalsIgnoreCase("")  || txtmiddlename.getText().toString().equalsIgnoreCase("") ){
+                                        Helper.createCustomThemedDialogOKOnly(activity, "Warning", "Full name is required", "OK", R.color.red);
+                                    }else if(txtBirthPlace.getText().toString().equalsIgnoreCase("")){
+                                        Helper.createCustomThemedDialogOKOnly(activity, "Warning", "Birthplace is required to continue", "OK", R.color.red);
+                                    }else if(txtHouseNumber.getText().toString().equalsIgnoreCase("") || txtBarangay.getText().toString().equalsIgnoreCase("")|| txtCity.getText().toString().equalsIgnoreCase("") || txtProvince.getText().toString().equalsIgnoreCase("")){
+                                        Helper.createCustomThemedDialogOKOnly(activity, "Warning", "Address is required to continue", "OK", R.color.red);
+                                    }
+
+
+                                    isEditPressed = false;
+                                    toggleEditPressed();
+
+                                    String strSpouseFname, strSpouseMname, strSpouseLname, strSpouseBirthday;
+                                    if (txtCivilStatus.getText().toString().equalsIgnoreCase("married")) {
+                                        strSpouseFname = txtSpouseFname.getText().toString();
+                                        strSpouseMname = txtSpouseMname.getText().toString();
+                                        strSpouseLname = txtSpouseLname.getText().toString();
+                                        strSpouseBirthday = txtSpouseBirthday.getText().toString();
+                                    } else {
+                                        strSpouseFname = " --- ";
+                                        strSpouseMname = " --- ";
+                                        strSpouseLname = " --- ";
+                                        strSpouseBirthday = "1970-1-1";
+                                    }
+                                    long id1 = db.updateCustomerInfo(id, txtfirstname.getText().toString(), txtlastname.getText().toString(),
+                                            txtmiddlename.getText().toString(), txtfarmid.getText().toString(), txtHouseNumber.getText().toString(), txtStreet.getText().toString(),
+                                            txtSubdivision.getText().toString(), txtBarangay.getText().toString(), txtCity.getText().toString(), txtProvince.getText().toString(), txtbirthday.getText().toString(),
+                                            txtBirthPlace.getText().toString(), strSpouseBirthday, txttelePhone.getText().toString(), txtCellphone.getText().toString(),
+                                            txtCivilStatus.getText().toString(), strSpouseFname, strSpouseMname, strSpouseLname);
+                                    if (id1 != -1) {
+                                        Dialog d = Helper.createCustomThemedDialogOKOnly(activity, "Success", "Changes has been saved successfully", "OK", R.color.blue);
+                                        Button ok = (Button) d.findViewById(R.id.btn_dialog_okonly_OK);
+                                        ok.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+
+                                                Intent intent = new Intent(activity, MapsActivity.class);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                intent.putExtra("fromActivity", "addfarminfo");
+
+                                                Logging.loguserAction(activity, activity.getBaseContext(),
+                                                        Helper.userActions.TSR.EDIT_MAIN_CUSTOMERINFO + ":" + Helper.variables.getGlobalVar_currentUserID(activity) + "-" + id + "-" + txtfirstname.getText().toString() + " " + txtlastname.getText().toString(),
+                                                        Helper.variables.ACTIVITY_LOG_TYPE_TSR_MONITORING);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        });
+                                    } else {
+                                        Helper.createCustomThemedDialogOKOnly(activity, "Error", "Something happened. Please try again.", "OK", R.color.red);
+                                    }
+
+                                }
+                            });
+                        }
+//                    } else {
+//                        Helper.createCustomThemedDialogOKOnly(activity, "Oops", "This Data is uploaded in the internet. You have to contact admin to make changes on this post.", "OK", R.color.skyblue_500);
+//                    }
 
             }
         });
@@ -371,28 +397,28 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         lblTelephone.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return editOneValue(txttelePhone);
+                return editOneValue(txttelePhone, "Enter Telephone number:");
             }
         });
 
         llTelephone.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return editOneValue(txttelePhone);
+                return editOneValue(txttelePhone, "Enter Telephone number:");
             }
         });
 
         lblCellphone.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return editOneValue(txtCellphone);
+                return editOneValue(txtCellphone,"Enter Cellphone number:");
             }
         });
 
         llCellphone.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return editOneValue(txtCellphone);
+                return editOneValue(txtCellphone, "Enter Cellphone number:");
             }
         });
 
@@ -408,6 +434,20 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
             @Override
             public boolean onLongClick(View v) {
                 return editSpouseBirthday();
+            }
+        });
+
+        llSpouseFullname.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editSpouseFullName();
+            }
+        });
+
+        llCivilStatus.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return editCivilStatus();
             }
         });
 
@@ -441,9 +481,9 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     }
 
 
-    private boolean editOneValue(final TextView txtView) {
+    private boolean editOneValue(final TextView txtView, String prompt) {
         if (isEditPressed){
-            final Dialog d = Helper.createCustomDialogThemedYesNO_WithEditText(activity, "Enter new Farm ID:", txtfarmid.getText().toString(), "Edit", "CANCEL", "SAVE", R.color.blue);
+            final Dialog d = Helper.createCustomDialogThemedYesNO_WithEditText(activity, prompt, txtView.getText().toString(), "Edit", "CANCEL", "SAVE", R.color.blue);
             final EditText edt = (EditText) d.findViewById(R.id.dialog_edttext);
             Button cancel = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
             Button save = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
@@ -505,6 +545,50 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
                     txtfirstname.setText(edtfname.getText()+"");
                     txtmiddlename.setText(edtmname.getText() + "");
                     txtlastname.setText(edtlname.getText()+"");
+                    d.hide();
+                }
+            });
+        }
+        return false;
+    }
+
+
+    private boolean editSpouseFullName() {
+        if (isEditPressed){
+            final Dialog d = new Dialog(activity);//
+            d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            d.setContentView(R.layout.dialog_material_themed_changefullname);//Set the xml view of the dialog
+            Button cancel = (Button) d.findViewById(R.id.btn_dialog_yesno_opt1);
+            Button save = (Button) d.findViewById(R.id.btn_dialog_yesno_opt2);
+            final EditText edtfname = (EditText) d.findViewById(R.id.edt_dialog_firstName);
+            final EditText edtlname = (EditText) d.findViewById(R.id.edt_dialog_LastName);
+            final EditText edtmname = (EditText) d.findViewById(R.id.edt_dialog_middleName);
+
+            TextView txttitle = (TextView) d.findViewById(R.id.dialog_yesno_title);
+
+            edtfname.setText(txtSpouseFname.getText()+"");
+            edtlname.setText(txtSpouseLname.getText()+"");
+            edtmname.setText(txtSpouseMname.getText() + "");
+
+            txttitle.setText("Edit");
+            txttitle.setBackground(activity.getResources().getDrawable(R.color.skyblue_500));
+            cancel.setText("CANCEL");
+            save.setText("SAVE");
+            d.show();
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    d.hide();
+                }
+            });
+
+            save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    txtSpouseFname.setText(edtfname.getText()+"");
+                    txtSpouseMname.setText(edtmname.getText() + "");
+                    txtSpouseLname.setText(edtlname.getText()+"");
                     d.hide();
                 }
             });
@@ -708,6 +792,35 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
     }
 
 
+    private boolean editCivilStatus() {
+        if (isEditPressed) {
+            final String[] options = new String[]{"Single", "Married", "Widowed"};
+            final Dialog d = Helper.createCustomThemedListDialog(activity, options, "Civil Status", R.color.blue );
+            ListView lv = (ListView) d.findViewById(R.id.dialog_list_listview);
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    txtCivilStatus.setText(options[position]);
+
+                    if (options[position].equalsIgnoreCase("single")) {
+                        txtSpouseFname.setText(" --- ");
+                        txtSpouseLname.setText("");
+                        txtSpouseMname.setText("");
+                        txtSpouseBirthday.setText(" --- ");
+                    }
+
+                    d.hide();
+
+                }
+            });
+
+            d.show();
+
+        }
+        return false;
+    }
+
+
     private void toggleEditPressed() {
         if (isEditPressed){
             btn_edit.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_darkteal_24dp));
@@ -857,7 +970,9 @@ public class Activity_CustomerDetails extends FragmentActivity implements DatePi
         txtSpouseLname.setText(custInfoObject.getSpouse_lname()+"");
         txtSpouseMname.setText(custInfoObject.getSpouse_mname()+"");
         txtSpouseBirthday.setText(custInfoObject.getSpouse_birthday()+"");
-
+    
+        isPosted = custInfoObject.getIsPosted();
+        
 
         setViewVisibilities();
 
